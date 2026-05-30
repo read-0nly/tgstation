@@ -19,6 +19,8 @@
 	var/active = FALSE
 	///The final countdown (delay before we explode)
 	var/delay = MICROBOMB_DELAY
+	///If the delay is equal or lower to MICROBOMB_DELAY (0.7 sec), the explosion will be instantaneous.
+	var/instant_explosion = TRUE
 	///Radius of weak devastation explosive impact
 	var/explosion_light = MICROBOMB_EXPLOSION_LIGHT
 	///Radius of medium devastation explosive impact
@@ -33,7 +35,20 @@
 	var/no_paralyze = FALSE
 	///Do we override other explosive implants?
 	var/master_implant = FALSE
+	///Will this implant notify ghosts when activated?
+	var/notify_ghosts = TRUE
+	///Do we tell people when they activated it?
+	var/announce_activation = TRUE
 
+	implant_info = "Activates upon death or encoded signal. Triggers an electrically-detonated microexplosive. \
+		Can sync with other microbombs to increase explosive yield, but this makes detonation non-instant."
+
+	implant_lore = "The Robust Corp RX-78 Employee Management Implant is an electrically-detonated microexplosive, \
+		designed to motivate employees (for organizations with questionable ethics) and/or prevent recovery of \
+		equipment and/or evidence (for non-state actors). \
+		The microexplosive arms upon cessation of vital signs or manual activation. \
+		Upon arming, attempts to sync with any other detected microexplosives for increased detonation yield; \
+		the handshake process between microbombs, however, takes a bit, and only gets longer as more microbombs are detected."
 
 /obj/item/implant/explosive/proc/on_death(datum/source, gibbed)
 	SIGNAL_HANDLER
@@ -43,18 +58,6 @@
 	// signal handlers at least finish. Also, the "delayed explosion"
 	// uses sleeps, which is bad for signal handlers to do.
 	INVOKE_ASYNC(src, PROC_REF(activate), "death")
-
-/obj/item/implant/explosive/get_data()
-	var/dat = {"<b>Implant Specifications:</b><BR>
-				<b>Name:</b> Robust Corp RX-78 Employee Management Implant<BR>
-				<b>Life:</b> Activates upon death.<BR>
-				<b>Important Notes:</b> Explodes<BR>
-				<HR>
-				<b>Implant Details:</b><BR>
-				<b>Function:</b> Contains a compact, electrically detonated explosive that detonates upon receiving a specially encoded signal or upon host death.<BR>
-				<b>Special Features:</b> Explodes<BR>
-				"}
-	return dat
 
 /obj/item/implant/explosive/activate(cause)
 	. = ..()
@@ -70,12 +73,13 @@
 			return FALSE
 	if(cause == "death" && HAS_TRAIT(imp_in, TRAIT_PREVENT_IMPLANT_AUTO_EXPLOSION))
 		return FALSE
-	to_chat(imp_in, span_notice("You activate your [name]."))
+	if(announce_activation)
+		to_chat(imp_in, span_notice("You activate your [name]."))
 	active = TRUE
 	var/turf/boomturf = get_turf(imp_in)
 	message_admins("[ADMIN_LOOKUPFLW(imp_in)] has activated their [name] at [ADMIN_VERBOSEJMP(boomturf)], with cause of [cause].")
 	//If the delay is shorter or equal to the default delay, just blow up already jeez
-	if(delay <= MICROBOMB_DELAY)
+	if(delay <= MICROBOMB_DELAY && instant_explosion)
 		explode()
 		return
 	timed_explosion()
@@ -85,7 +89,7 @@
 		if(istype(target_implant, /obj/item/implant/explosive)) //we don't use our own type here, because macrobombs inherit this proc and need to be able to upgrade microbombs
 			var/obj/item/implant/explosive/other_implant = target_implant
 			if(other_implant.master_implant && master_implant) //we cant have two master implants at once
-				target.balloon_alert(target, "cannot fit implant!")
+				target.balloon_alert(user, "cannot fit implant!")
 				return FALSE
 			if(master_implant)
 				merge_implants(src, other_implant)
@@ -105,7 +109,7 @@
 /**
  * Merges two explosive implants together, adding the stats of the latter to the former before qdeling the latter implant.
  * kept_implant = the implant that is kept
- * stat_implant = the implant which has it's stats added to kept_implant, before being deleted.
+ * stat_implant = the implant which has its stats added to kept_implant, before being deleted.
  */
 /obj/item/implant/explosive/proc/merge_implants(obj/item/implant/explosive/kept_implant, obj/item/implant/explosive/stat_implant)
 	kept_implant.explosion_devastate += stat_implant.explosion_devastate
@@ -119,16 +123,19 @@
  * Make the implantee beep a few times, keel over and explode. Usually to a devastating effect.
  */
 /obj/item/implant/explosive/proc/timed_explosion()
-	imp_in.visible_message(span_warning("[imp_in] starts beeping ominously!"))
-
-	notify_ghosts(
-		"[imp_in] is about to detonate their explosive implant!",
-		source = src,
-		header = "Tick Tick Tick...",
-		notify_flags = NOTIFY_CATEGORY_NOFLASH,
-		ghost_sound = 'sound/machines/warning-buzzer.ogg',
-		notify_volume = 75,
-	)
+	if (isnull(imp_in))
+		visible_message(span_warning("[src] starts beeping ominously!"))
+	else
+		imp_in.visible_message(span_warning("[imp_in] starts beeping ominously!"))
+		if(notify_ghosts)
+			notify_ghosts(
+				"[imp_in.real_name] is about to detonate their explosive implant!",
+				source = src,
+				header = "Tick Tick Tick...",
+				notify_flags = NOTIFY_CATEGORY_NOFLASH,
+				ghost_sound = 'sound/machines/warning-buzzer.ogg',
+				notify_volume = 75,
+			)
 
 	playsound(loc, 'sound/items/timer.ogg', 30, FALSE)
 	if(!panic_beep_sound)
@@ -136,16 +143,13 @@
 	if(imp_in && !imp_in.stat && !no_paralyze)
 		imp_in.visible_message(span_warning("[imp_in] doubles over in pain!"))
 		imp_in.Paralyze(14 SECONDS)
-	//total of 4 bomb beeps, and we've already beeped once
-	var/bomb_beeps_until_boom = 3
+
 	if(!panic_beep_sound)
-		while(bomb_beeps_until_boom > 0)
+		for(var/index in 1 to 3) // Total of 4 bomb beeps, and we've already beeped once
 			//for extra spice
-			var/beep_volume = 35
+			var/beep_volume = 30 + (5 * index)
 			playsound(loc, 'sound/items/timer.ogg', beep_volume, vary = FALSE)
 			sleep(delay * 0.25)
-			bomb_beeps_until_boom--
-			beep_volume += 5
 		explode()
 	else
 		addtimer(CALLBACK(src, PROC_REF(explode)), delay)
@@ -158,14 +162,15 @@
 
 
 ///When called, just explodes
-/obj/item/implant/explosive/proc/explode()
-	explosion_devastate = round(explosion_devastate)
-	explosion_heavy = round(explosion_heavy)
-	explosion_light = round(explosion_light)
-	explosion(src, devastation_range = explosion_devastate, heavy_impact_range = explosion_heavy, light_impact_range = explosion_light, flame_range = explosion_light, flash_range = explosion_light, explosion_cause = src)
-	if(imp_in)
-		imp_in.investigate_log("has been gibbed by an explosive implant.", INVESTIGATE_DEATHS)
-		imp_in.gib(DROP_ORGANS|DROP_BODYPARTS)
+/obj/item/implant/explosive/proc/explode(atom/override_explode_target = null)
+	explosion_devastate = floor(explosion_devastate)
+	explosion_heavy = floor(explosion_heavy)
+	explosion_light = floor(explosion_light)
+	explosion(override_explode_target || src, devastation_range = explosion_devastate, heavy_impact_range = explosion_heavy, light_impact_range = explosion_light, flame_range = explosion_light, flash_range = explosion_light, explosion_cause = src)
+	var/mob/living/kill_mob = isliving(override_explode_target) ? override_explode_target : imp_in
+	if(!isnull(kill_mob))
+		kill_mob.investigate_log("has been gibbed by an explosive implant.", INVESTIGATE_DEATHS)
+		kill_mob.gib(DROP_ORGANS|DROP_BODYPARTS)
 	qdel(src)
 
 ///Macrobomb has the strength and delay of 10 microbombs
@@ -177,6 +182,12 @@
 	explosion_light = 10 * MICROBOMB_EXPLOSION_LIGHT
 	explosion_heavy = 10 * MICROBOMB_EXPLOSION_HEAVY
 	explosion_devastate = 10 * MICROBOMB_EXPLOSION_DEVASTATE
+	implant_lore = "The Robust Corp RX-78/M Employee Management Implant is an electrically-detonated explosive, \
+		designed to maximize the prevention of recovery of equipment and/or evidence by virtue of being ten microbombs all connected to one implant. \
+		Unfortunately, the handshake sequence between microbombs remains an issue. \
+		The microexplosives arm upon cessation of vital signs or manual activation. \
+		Upon arming, attempts to sync with any other detected microexplosives for increased detonation yield; \
+		the handshake process between microbombs, however, takes a bit, and only gets longer as more microbombs are detected."
 
 ///Microbomb which prevents you from going into critical condition but also explodes after a timer when you reach critical condition in the first place.
 /obj/item/implant/explosive/deniability
@@ -186,6 +197,18 @@
 	panic_beep_sound = TRUE
 	no_paralyze = TRUE
 	master_implant = TRUE
+
+	implant_info = parent_type::implant_info + "While implanted, prevents unconsciousness from excessive trauma. \
+		Does not prevent death from excessive trauma, nor being stunned. \
+		Also delays detonation of other implanted microbombs by ten seconds."
+
+	implant_lore = "The Robust Corp RX-78/T Tactical Deniability Implant is an electrically-detonated microexplosive and \
+		paired neural override lattice, designed to prevent recovery of equipment and/or evidence for non-state actors, \
+		and prevent the reception of pain signals upon excessive trauma (colloquially, \"entering critical condition\"). \
+		The microexplosive arms upon cessation of vital signs or manual activation. \
+		Upon arming, attempts to sync with any other detected microexplosives for increased detonation yield; \
+		the handshake process between microbombs, however, takes a bit, and only gets longer as more microbombs are detected. \
+		The tactical deniability implant introduces a ten-second delay by itself in order to allow operators one last hurrah before death."
 
 /obj/item/implant/explosive/deniability/implant(mob/living/target, mob/user, silent = FALSE, force = FALSE)
 	. = ..()
@@ -204,6 +227,13 @@
 
 	if(source.health < source.crit_threshold)
 		INVOKE_ASYNC(src, PROC_REF(activate), "deniability")
+
+/obj/item/implant/explosive/deathmatch
+	name = "deathmatch microbomb implant"
+	delay = 0.5 SECONDS
+	actions_types = null
+	instant_explosion = FALSE
+	notify_ghosts = FALSE
 
 /obj/item/implanter/explosive
 	name = "implanter (microbomb)"

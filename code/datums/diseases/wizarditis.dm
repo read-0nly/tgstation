@@ -2,7 +2,7 @@
 	name = "Wizarditis"
 	max_stages = 4
 	spread_text = "Airborne"
-	cure_text = "The Manly Dorf"
+	cure_text = /datum/reagent/consumable/ethanol/manly_dorf::name + ", abated by magical grounding"
 	cures = list(/datum/reagent/consumable/ethanol/manly_dorf)
 	cure_chance = 100
 	agent = "Rincewindus Vulgaris"
@@ -47,7 +47,7 @@
 	QDEL_LIST(random_targeted_spells)
 	return ..()
 
-/datum/disease/wizarditis/stage_act(seconds_per_tick, times_fired)
+/datum/disease/wizarditis/stage_act(seconds_per_tick)
 	. = ..()
 	if(!.)
 		return
@@ -161,8 +161,10 @@
 	random_spells += sneeze_spacetime
 
 	var/datum/action/cooldown/spell/timestop/sneeze_timestop = new(src)
-	sneeze_timestop.timestop_range = 1 // heh
+	sneeze_timestop.timestop_range = 0 // heh
 	sneeze_timestop.timestop_duration = 5 SECONDS
+	sneeze_timestop.owner_is_immune_to_all_timestop = FALSE
+	sneeze_timestop.owner_is_immune_to_self_timestop = FALSE
 	random_spells += sneeze_timestop
 
 	var/datum/action/cooldown/spell/aoe/repulse/sneeze_repulse = new(src)

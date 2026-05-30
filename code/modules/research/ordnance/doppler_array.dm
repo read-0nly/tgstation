@@ -15,12 +15,12 @@
 	/// List of all explosion records in the form of /datum/data/tachyon_record
 	var/list/records = list()
 	/// Reference to a disk we are going to print to.
-	var/obj/item/computer_disk/inserted_disk
+	var/obj/item/disk/computer/inserted_disk
 
 	// Lighting system to better communicate the directions.
-	light_system = MOVABLE_LIGHT_DIRECTIONAL
+	light_system = OVERLAY_LIGHT_DIRECTIONAL
 	light_range = 4
-	light_power = 1
+	light_power = 1.5
 	light_color = COLOR_RED
 
 /obj/machinery/doppler_array/Initialize(mapload)
@@ -31,7 +31,7 @@
 	update_doppler_light()
 
 	// Rotation determines the detectable direction.
-	AddComponent(/datum/component/simple_rotation)
+	AddElement(/datum/element/simple_rotation)
 
 /datum/data/tachyon_record
 	name = "Log Recording"
@@ -48,33 +48,27 @@
 	. = ..()
 	. += span_notice("It is currently facing [dir2text(dir)]")
 
-/obj/machinery/doppler_array/attackby(obj/item/item, mob/user, params)
-	if(istype(item, /obj/item/computer_disk))
-		var/obj/item/computer_disk/disk = item
-		eject_disk(user)
-		if(user.transferItemToLoc(disk, src))
-			inserted_disk = disk
-			return
-		else
-			balloon_alert(user, "it's stuck to your hand!")
-			return ..()
-	return ..()
+/obj/machinery/doppler_array/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(!istype(tool, /obj/item/disk/computer))
+		return NONE
+	eject_disk(user)
+	if(!user.transferItemToLoc(tool, src))
+		balloon_alert(user, "it's stuck to your hand!")
+		return ITEM_INTERACT_BLOCKING
+	inserted_disk = tool
+	return ITEM_INTERACT_SUCCESS
 
 /obj/machinery/doppler_array/wrench_act(mob/living/user, obj/item/tool)
 	default_unfasten_wrench(user, tool)
 	return ITEM_INTERACT_SUCCESS
 
 /obj/machinery/doppler_array/screwdriver_act(mob/living/user, obj/item/tool)
-	if(!default_deconstruction_screwdriver(user, "[base_icon_state]", "[base_icon_state]", tool))
-		return FALSE
+	. = default_deconstruction_screwdriver(user, tool)
 	power_change()
-	update_appearance()
-	return TRUE
+	return .
 
 /obj/machinery/doppler_array/crowbar_act(mob/living/user, obj/item/tool)
-	if(!default_deconstruction_crowbar(tool))
-		return FALSE
-	return TRUE
+	return default_deconstruction_crowbar(user, tool)
 
 /// Printing of a record into a disk.
 /obj/machinery/doppler_array/proc/print(mob/user, datum/data/tachyon_record/record)
@@ -89,7 +83,7 @@
 	if(inserted_disk.add_file(record_data))
 		playsound(src, 'sound/machines/ping.ogg', 25)
 	else
-		playsound(src, 'sound/machines/terminal_error.ogg', 25)
+		playsound(src, 'sound/machines/terminal/terminal_error.ogg', 25)
 
 /**
  * Checks a specified tachyon record for fitting reactions, then returns a list with
@@ -175,7 +169,7 @@
 
 	var/datum/data/tachyon_record/new_record = new /datum/data/tachyon_record()
 	new_record.name = "Log Recording #[record_number]"
-	new_record.timestamp = station_time_timestamp()
+	new_record.timestamp = "[server_timestamp(ic_time = TRUE)] (PT: [round_timestamp()])"
 	new_record.coordinates = "[epicenter.x], [epicenter.y]"
 	new_record.displacement = took
 	new_record.factual_radius["epicenter_radius"] = devastation_range
@@ -207,10 +201,10 @@
 /obj/machinery/doppler_array/proc/eject_disk(mob/user)
 	if(!inserted_disk)
 		return FALSE
-	if(user)
-		user.put_in_hands(inserted_disk)
-	else
+	if(!user || !Adjacent(user))
 		inserted_disk.forceMove(drop_location())
+	else
+		user.put_in_hands(inserted_disk)
 	playsound(src, 'sound/machines/card_slide.ogg', 50)
 	return TRUE
 
@@ -237,21 +231,19 @@
 	else if (machine_stat & NOPOWER)
 		. += mutable_appearance(icon, "[base_icon_state]_screen-off")
 
-/obj/machinery/doppler_array/on_deconstruction()
+/obj/machinery/doppler_array/on_deconstruction(disassembled)
 	eject_disk()
 	. = ..()
 
 /obj/machinery/doppler_array/Destroy()
 	inserted_disk = null
-	QDEL_NULL(records) //We only want the list nuked, not the contents.
-	. = ..()
+	records.Cut() // We only want to clear the list itself, not delete its contents.
+	return ..()
 
 /obj/machinery/doppler_array/proc/update_doppler_light()
 	SIGNAL_HANDLER
 	set_light_on(!(machine_stat & NOPOWER))
 
-/obj/machinery/doppler_array/AltClick(mob/user)
-	return ..() // This hotkey is BLACKLISTED since it's used by /datum/component/simple_rotation
 
 /obj/machinery/doppler_array/ui_interact(mob/user, datum/tgui/ui)
 	ui = SStgui.try_update_ui(user, src, ui)
@@ -292,7 +284,7 @@
 		data["records"] += list(record_data)
 	return data
 
-/obj/machinery/doppler_array/ui_act(action, list/params)
+/obj/machinery/doppler_array/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
 	if(.)
 		return

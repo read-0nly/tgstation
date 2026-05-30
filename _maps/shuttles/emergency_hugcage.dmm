@@ -3,7 +3,7 @@
 /turf/closed/wall/mineral/titanium/nodiagonal,
 /area/shuttle/escape/brig)
 "aR" = (
-/obj/item/bedsheet/random{
+/obj/effect/spawner/random/bedsheet/any{
 	dir = 8
 	},
 /obj/structure/bed,
@@ -73,17 +73,18 @@
 /turf/open/floor/mineral/titanium/yellow,
 /area/shuttle/escape)
 "fM" = (
-/obj/structure/sink/directional/north,
 /obj/effect/turf_decal/siding/dark_blue{
 	dir = 8
 	},
+/obj/machinery/stasis,
+/obj/machinery/vitals_reader/directional/south,
 /turf/open/floor/mineral/titanium/blue,
 /area/shuttle/escape)
 "gc" = (
 /turf/closed/wall/mineral/titanium,
 /area/shuttle/escape)
 "gg" = (
-/obj/item/bedsheet/random{
+/obj/effect/spawner/random/bedsheet/any{
 	dir = 4
 	},
 /obj/structure/bed{
@@ -116,7 +117,7 @@
 /area/shuttle/escape)
 "iI" = (
 /obj/structure/bed,
-/obj/item/bedsheet/random,
+/obj/effect/spawner/random/bedsheet/any,
 /obj/item/pillow/random,
 /obj/effect/spawner/random/entertainment/plushie_delux,
 /turf/open/floor/mineral/titanium/yellow,
@@ -138,17 +139,17 @@
 /area/shuttle/escape/brig)
 "nZ" = (
 /obj/structure/table/optable,
-/obj/machinery/status_display/evac/directional/west,
 /obj/item/toy/plush/lizard_plushie{
 	name = "Heals-The-Patients"
 	},
+/obj/machinery/vitals_reader/directional/west,
 /turf/open/floor/mineral/titanium/blue,
 /area/shuttle/escape)
 "oo" = (
 /obj/structure/bed{
 	dir = 1
 	},
-/obj/item/bedsheet/random{
+/obj/effect/spawner/random/bedsheet/any{
 	dir = 4
 	},
 /obj/item/pillow/random,
@@ -159,7 +160,11 @@
 /obj/machinery/defibrillator_mount/loaded{
 	pixel_x = 32
 	},
-/obj/machinery/stasis,
+/obj/structure/sink/directional/north{
+	dir = 8;
+	pixel_y = 0;
+	pixel_x = 15
+	},
 /turf/open/floor/mineral/titanium/blue,
 /area/shuttle/escape)
 "oY" = (
@@ -211,7 +216,7 @@
 /turf/open/floor/mineral/titanium/blue,
 /area/shuttle/escape)
 "ys" = (
-/obj/item/bedsheet/random{
+/obj/effect/spawner/random/bedsheet/any{
 	dir = 4
 	},
 /obj/structure/bed{
@@ -327,7 +332,7 @@
 /turf/open/floor/mineral/plastitanium/red,
 /area/shuttle/escape/brig)
 "KW" = (
-/obj/item/bedsheet/random{
+/obj/effect/spawner/random/bedsheet/any{
 	dir = 8
 	},
 /obj/structure/bed,
@@ -364,11 +369,14 @@
 /turf/open/floor/mineral/titanium/yellow,
 /area/shuttle/escape)
 "Rg" = (
-/obj/machinery/stasis,
+/obj/machinery/stasis{
+	dir = 4
+	},
 /obj/machinery/light/dim/directional/south{
 	brightness = 5;
 	nightshift_brightness = 4
 	},
+/obj/machinery/vitals_reader/directional/south,
 /turf/open/floor/mineral/titanium/blue,
 /area/shuttle/escape)
 "Rj" = (

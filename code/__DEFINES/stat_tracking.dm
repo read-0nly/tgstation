@@ -15,7 +15,8 @@
 #define INIT_COST(costs, counting) \
 	var/list/_costs = costs; \
 	var/list/_counting = counting; \
-	var/_usage = TICK_USAGE;
+	var/_usage = TICK_USAGE; \
+	var/_cost = 0;
 
 // STATIC cost tracking macro. Uses static lists instead of the normal global ones
 // Good for debug stuff, and for running before globals init
@@ -33,10 +34,22 @@
 	} \
 	_usage = TICK_USAGE;
 
+#define SET_COST_BOUNDS(category) \
+	do { \
+		_cost = TICK_USAGE; \
+		var/_tmp_delta = TICK_DELTA_TO_MS(_cost - _usage);\
+		_costs[category] += _tmp_delta;\
+		_counting[category] += 1;\
+		_costs["[category]_min"] = min(_tmp_delta, _costs["[category]_min"] || INFINITY);\
+		_counting["[category]_min"] += 1;\
+		_costs["[category]_max"] = max(_tmp_delta, _costs["[category]_max"] || 0);\
+		_counting["[category]_max"] += 1;\
+	} while(FALSE); \
+	_usage = TICK_USAGE;
 
 #define SET_COST(category) \
 	do { \
-		var/_cost = TICK_USAGE; \
+		_cost = TICK_USAGE; \
 		_costs[category] += TICK_DELTA_TO_MS(_cost - _usage);\
 		_counting[category] += 1; \
 	} while(FALSE); \
@@ -54,7 +67,8 @@
 #define EXPORT_STATS_TO_FILE_LATER(filename, costs, counts, proc) \
 	do { \
 		var/static/last_export = 0; \
-		if (world.time - last_export > 1.1 SECONDS) { \
+		/* Need to always run if we haven't yet, since this code can be placed ANYWHERE */ \
+		if (world.time - last_export > 1.1 SECONDS || (last_export == 0)) { \
 			last_export = world.time; \
 			/* spawn() is used here because this is often used to track init times, where timers act oddly. */ \
 			/* I was making timers and even after init times were complete, the timers didn't run :shrug: */ \

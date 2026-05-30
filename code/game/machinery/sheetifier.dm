@@ -7,12 +7,12 @@
 	circuit = /obj/item/circuitboard/machine/sheetifier
 	layer = BELOW_OBJ_LAYER
 	var/busy_processing = FALSE
-	var/datum/component/material_container/materials
+	var/datum/material_container/materials
 
 /obj/machinery/sheetifier/Initialize(mapload)
 	. = ..()
-	materials = AddComponent( \
-		/datum/component/material_container, \
+	materials = new ( \
+		src, \
 		list(/datum/material/meat, /datum/material/hauntium), \
 		SHEET_MATERIAL_AMOUNT * MAX_STACK_SIZE * 2, \
 		MATCONTAINER_EXAMINE, \
@@ -24,7 +24,7 @@
 	)
 
 /obj/machinery/sheetifier/Destroy()
-	materials = null
+	QDEL_NULL(materials)
 	return ..()
 
 /obj/machinery/sheetifier/update_overlays()
@@ -50,23 +50,21 @@
 	var/mutable_appearance/processing_overlay = mutable_appearance(icon, "processing")
 	processing_overlay.color = last_inserted_material.color
 	flick_overlay_static(processing_overlay, src, 64)
-	addtimer(CALLBACK(src, PROC_REF(finish_processing)), 64)
+	addtimer(CALLBACK(src, PROC_REF(finish_processing)), 6.4 SECONDS)
 
 /obj/machinery/sheetifier/proc/finish_processing()
 	busy_processing = FALSE
 	update_appearance()
 	materials.retrieve_all() //Returns all as sheets
-	use_power(active_power_usage)
+	use_energy(active_power_usage)
 
 /obj/machinery/sheetifier/wrench_act(mob/living/user, obj/item/tool)
 	. = ..()
 	default_unfasten_wrench(user, tool)
 	return ITEM_INTERACT_SUCCESS
 
-/obj/machinery/sheetifier/attackby(obj/item/I, mob/user, params)
-	if(default_deconstruction_screwdriver(user, initial(icon_state), initial(icon_state), I))
-		update_appearance()
-		return
-	if(default_deconstruction_crowbar(I))
-		return
-	return ..()
+/obj/machinery/sheetifier/screwdriver_act(mob/living/user, obj/item/tool)
+	return default_deconstruction_screwdriver(user, tool)
+
+/obj/machinery/sheetifier/crowbar_act(mob/living/user, obj/item/tool)
+	return default_deconstruction_crowbar(user, tool)

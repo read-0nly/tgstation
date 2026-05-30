@@ -1,20 +1,21 @@
 
 /obj/structure/window/reinforced/fulltile/indestructible
 	name = "robust window"
-	obj_flags = /obj::obj_flags | NO_DECONSTRUCTION
+	move_resist = MOVE_FORCE_OVERPOWERING
 	flags_1 = PREVENT_CLICK_UNDER_1
 	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF
 
-/obj/structure/window/reinforced/fulltile/indestructible/rcd_vals(mob/user, obj/item/construction/rcd/the_rcd)
-	return FALSE
-
 
 /obj/structure/grille/indestructible
-	obj_flags = CONDUCTS_ELECTRICITY | NO_DECONSTRUCTION
+	desc = "A STRONG framework of hardened plasteel rods, that you cannot possibly get through. If you were an engineer you would be drooling over its construction right now."
+	move_resist = MOVE_FORCE_OVERPOWERING
+	obj_flags = CONDUCTS_ELECTRICITY
 	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | UNACIDABLE | ACID_PROOF
 
-/obj/structure/grille/indestructible/rcd_vals(mob/user, obj/item/construction/rcd/the_rcd)
-	return FALSE
+/obj/structure/grille/indestructible/Initialize(mapload)
+	. = ..()
+	AddElement(/datum/element/tool_blocker, TOOL_SCREWDRIVER, TOOL_ACT_PRIMARY)
+	AddElement(/datum/element/tool_blocker, TOOL_WIRECUTTER, TOOL_ACT_PRIMARY)
 
 /obj/effect/spawner/structure/window/reinforced/indestructible
 	spawn_list = list(/obj/structure/grille/indestructible, /obj/structure/window/reinforced/fulltile/indestructible)
@@ -22,8 +23,6 @@
 /obj/structure/barricade/security/murderdome
 	name = "respawnable barrier"
 	desc = "A barrier. Provides cover in firefights."
-	deploy_time = 0
-	deploy_message = 0
 
 /obj/structure/barricade/security/murderdome/make_debris()
 	new /obj/effect/murderdome/dead_barricade(get_turf(src))

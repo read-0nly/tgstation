@@ -1,7 +1,11 @@
 /datum/hallucination/message
 	random_hallucination_weight = 60
+	hallucination_tier = HALLUCINATION_TIER_COMMON
 
 /datum/hallucination/message/start()
+	if(hallucinator.stat >= UNCONSCIOUS)
+		return FALSE
+
 	var/list/nearby_humans = list()
 	var/adjacent_to_us = FALSE
 	var/mob/living/carbon/human/suspicious_personnel
@@ -25,7 +29,7 @@
 			// in the future, this could / should be de-harcoded and
 			// just draw from a pool uplink, theft, and antag item typepaths
 			var/static/list/stash_item_paths = list(
-				/obj/item/areaeditor/blueprints,
+				/obj/item/blueprints,
 				/obj/item/assembly/flash,
 				/obj/item/card/id/advanced/gold/captains_spare,
 				/obj/item/card/emag,

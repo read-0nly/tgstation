@@ -40,7 +40,7 @@
 "fD" = (
 /obj/structure/bed,
 /obj/effect/decal/cleanable/blood/bubblegum,
-/obj/item/bedsheet/random,
+/obj/effect/spawner/random/bedsheet/any,
 /turf/open/floor/wood,
 /area/ruin/powered)
 "gG" = (
@@ -416,7 +416,7 @@
 /obj/structure/bed{
 	dir = 4
 	},
-/obj/item/bedsheet/random{
+/obj/effect/spawner/random/bedsheet/any{
 	dir = 4
 	},
 /turf/open/floor/wood,
@@ -439,7 +439,7 @@
 /area/ruin/powered)
 "PQ" = (
 /obj/effect/decal/cleanable/blood/splatter,
-/mob/living/simple_animal/hostile/illusion{
+/mob/living/basic/illusion{
 	death_message = "disperses into the air in a cloud of red mist, you feel slightly more at ease.";
 	desc = "You can't quite make out what you're seeing.";
 	faction = list("cult");
@@ -467,7 +467,7 @@
 	pixel_y = 4
 	},
 /obj/item/bodypart/chest,
-/obj/item/organ/internal/heart,
+/obj/item/organ/heart,
 /obj/item/multitool,
 /turf/open/floor/iron/freezer,
 /area/ruin/powered)

@@ -63,7 +63,7 @@
 		update_name()
 
 /// Choose what our prize is :D
-/obj/item/coupon/proc/generate(discount, datum/supply_pack/discounted_pack)
+/obj/item/coupon/proc/generate(discount, datum/supply_pack/discounted_pack, mob/user)
 	src.discounted_pack = discounted_pack || pick(GLOB.discountable_packs[pick_weight(GLOB.pack_discount_odds)])
 	var/static/list/chances = list("0.10" = 4, "0.15" = 8, "0.20" = 10, "0.25" = 8, "0.50" = 4, COUPON_OMEN = 1)
 	discount_pct_off = discount || pick_weight(chances)
@@ -77,14 +77,14 @@
 	name = "coupon - fuck you"
 	desc = "The small text reads, 'You will be slaughtered'... That doesn't sound right, does it?"
 
-	if(!ismob(loc))
+	var/mob/cursed = user || loc
+	if(!ismob(cursed))
 		return FALSE
 
-	var/mob/cursed = loc
 	to_chat(cursed, span_warning("The coupon reads '<b>fuck you</b>' in large, bold text... is- is that a prize, or?"))
 
 	if(!cursed.GetComponent(/datum/component/omen))
-		cursed.AddComponent(/datum/component/omen)
+		cursed.AddComponent(/datum/component/omen, src, 1)
 		return TRUE
 	if(HAS_TRAIT(cursed, TRAIT_CURSED))
 		to_chat(cursed, span_warning("What a horrible night... To have a curse!"))
@@ -98,6 +98,7 @@
 /obj/item/coupon/proc/curse_heart(mob/living/cursed)
 	if(!iscarbon(cursed))
 		cursed.gib(DROP_ALL_REMAINS)
+		burn_evilly()
 		return TRUE
 
 	var/mob/living/carbon/player = cursed
@@ -105,16 +106,21 @@
 	to_chat(player, span_mind_control("What could that coupon mean?"))
 	to_chat(player, span_userdanger("...The suspense is killing you!"))
 	player.set_heartattack(status = TRUE)
+	burn_evilly()
 
-/obj/item/coupon/attack_atom(obj/O, mob/living/user, params)
-	if(!istype(O, /obj/machinery/computer/cargo))
+/obj/item/coupon/proc/burn_evilly()
+	visible_message(span_warning("[src] burns up in a sinister flash, taking an evil energy with it..."))
+	burn()
+
+/obj/item/coupon/attack_atom(obj/attacked_obj, mob/living/user, list/modifiers, list/attack_modifiers)
+	if(!istype(attacked_obj, /obj/machinery/computer/cargo))
 		return ..()
 	if(discount_pct_off == COUPON_OMEN)
-		to_chat(user, span_warning("\The [O] validates the coupon as authentic, but refuses to accept it..."))
-		O.say("Coupon fulfillment already in progress...")
+		to_chat(user, span_warning("\The [attacked_obj] validates the coupon as authentic, but refuses to accept it..."))
+		attacked_obj.say("Coupon fulfillment already in progress...")
 		return
 
-	inserted_console = O
+	inserted_console = attacked_obj
 	LAZYADD(inserted_console.loaded_coupons, src)
 	inserted_console.say("Coupon for [initial(discounted_pack.name)] applied!")
 	forceMove(inserted_console)
@@ -123,4 +129,4 @@
 	if(inserted_console)
 		LAZYREMOVE(inserted_console.loaded_coupons, src)
 		inserted_console = null
-	. = ..()
+	return ..()

@@ -3,6 +3,7 @@
 	desc = "A low-capacity, energy-based stun gun used by security teams to subdue targets at range."
 	icon_state = "taser"
 	inhand_icon_state = null //so the human update icon uses the icon_state instead.
+	light_color = LIGHT_COLOR_DIM_YELLOW
 	ammo_type = list(/obj/item/ammo_casing/energy/electrode)
 	ammo_x_offset = 3
 
@@ -19,10 +20,11 @@
 	can_charge = FALSE
 	use_cyborg_cell = TRUE
 
-/obj/item/gun/energy/e_gun/advtaser/cyborg/add_seclight_point()
-	return
+/obj/item/gun/energy/e_gun/advtaser/cyborg/Initialize(mapload)
+	. = ..()
+	AddElement(/datum/element/empprotection, EMP_PROTECT_ALL)
 
-/obj/item/gun/energy/e_gun/advtaser/cyborg/emp_act()
+/obj/item/gun/energy/e_gun/advtaser/cyborg/add_seclight_point()
 	return
 
 /obj/item/gun/energy/disabler
@@ -66,5 +68,6 @@
 	can_charge = FALSE
 	use_cyborg_cell = TRUE
 
-/obj/item/gun/energy/disabler/cyborg/emp_act()
-	return
+/obj/item/gun/energy/disabler/cyborg/Initialize(mapload)
+	. = ..()
+	AddElement(/datum/element/empprotection, EMP_PROTECT_ALL)

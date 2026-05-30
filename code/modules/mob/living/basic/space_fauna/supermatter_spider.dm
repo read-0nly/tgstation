@@ -9,7 +9,8 @@
 	icon_dead = "smspider_dead"
 
 	gender = NEUTER
-	mob_biotypes = MOB_BUG|MOB_ROBOTIC
+	status_flags = CANPUSH
+	mob_biotypes = MOB_BUG|MOB_ROBOTIC|MOB_MINERAL
 	speak_emote = list("vibrates")
 
 
@@ -22,8 +23,9 @@
 	health = 10
 	minimum_survivable_temperature = TCMB
 	maximum_survivable_temperature = T0C + 1250
-	habitable_atmos = list("min_oxy" = 0, "max_oxy" = 0, "min_plas" = 0, "max_plas" = 0, "min_co2" = 0, "max_co2" = 0, "min_n2" = 0, "max_n2" = 0)
+	habitable_atmos = null
 	death_message = "falls to the ground, its shard dulling to a miserable grey!"
+	damage_coeff = list(BRUTE = 1, BURN = 1, TOX = 1, STAMINA = 0, OXY = 1)
 
 	faction = list(FACTION_HOSTILE)
 
@@ -44,11 +46,11 @@
 	AddElement(/datum/element/ai_retaliate)
 	AddElement(/datum/element/footstep, FOOTSTEP_MOB_CLAW)
 
-	RegisterSignal(src, COMSIG_HOSTILE_PRE_ATTACKINGTARGET, PROC_REF(on_attack))
-
 /// Proc that we call on attacking something to dust 'em.
-/mob/living/basic/supermatter_spider/proc/on_attack(mob/living/basic/source, atom/target)
-	SIGNAL_HANDLER
+/mob/living/basic/supermatter_spider/early_melee_attack(atom/target, list/modifiers, ignore_cooldown)
+	. = ..()
+	if(.)
+		return
 
 	if(isliving(target))
 		var/mob/living/victim = target
@@ -57,14 +59,14 @@
 		victim.dust()
 		if(single_use)
 			death()
-		return COMPONENT_HOSTILE_NO_ATTACK
+		return BASIC_MOB_END_ATTACK_CHAIN_COOLDOWN
 
 	if(!isturf(target))
 		dust_feedback(target)
 		qdel(target)
 		if(single_use)
 			death()
-		return COMPONENT_HOSTILE_NO_ATTACK
+		return BASIC_MOB_END_ATTACK_CHAIN_COOLDOWN
 
 /// Simple proc that plays the supermatter dusting sound and sends a visible message.
 /mob/living/basic/supermatter_spider/proc/dust_feedback(atom/target)

@@ -65,9 +65,9 @@
 /area/virtual_domain/fullbright)
 "cb" = (
 /obj/structure/table/wood,
-/obj/item/reagent_containers/pill/lsd,
-/obj/item/reagent_containers/pill/lsd,
-/obj/item/reagent_containers/pill/lsd,
+/obj/item/reagent_containers/applicator/pill/lsd,
+/obj/item/reagent_containers/applicator/pill/lsd,
+/obj/item/reagent_containers/applicator/pill/lsd,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
 "cv" = (
@@ -84,34 +84,7 @@
 /turf/open/water/beach,
 /area/virtual_domain/fullbright)
 "db" = (
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/vending_refill/cigarette,
-/obj/item/vending_refill/boozeomat,
-/obj/structure/closet/secure_closet{
-	icon_state = "cabinet";
-	name = "booze storage";
-	req_access = list("bar")
-	},
-/obj/item/storage/backpack/duffelbag,
-/obj/item/etherealballdeployer,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/bottle/beer/light,
-/obj/item/reagent_containers/cup/glass/colocup,
-/obj/item/reagent_containers/cup/glass/colocup,
-/obj/item/reagent_containers/cup/glass/colocup,
-/obj/item/reagent_containers/cup/glass/colocup,
-/obj/item/reagent_containers/cup/glass/colocup,
+/obj/structure/closet/secure_closet/bar/lavaland_bartender_booze,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
 "di" = (
@@ -154,7 +127,7 @@
 /area/virtual_domain/fullbright)
 "fc" = (
 /obj/structure/table/wood,
-/obj/item/reagent_containers/pill/happy,
+/obj/item/reagent_containers/applicator/pill/happy,
 /obj/item/toy/figure/bartender{
 	pixel_x = -8;
 	pixel_y = -1
@@ -196,14 +169,11 @@
 	},
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
-"iz" = (
-/turf/closed/indestructible/binary,
-/area/lavaland/surface/outdoors/virtual_domain)
 "iR" = (
 /obj/structure/table,
 /obj/item/book/manual/wiki/barman_recipes,
 /obj/item/reagent_containers/cup/glass/shaker,
-/obj/item/reagent_containers/cup/rag,
+/obj/item/rag,
 /obj/machinery/light/small/directional/west,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
@@ -240,9 +210,8 @@
 /turf/open/floor/sepia,
 /area/virtual_domain/fullbright)
 "kv" = (
-/obj/effect/baseturf_helper/virtual_domain,
 /turf/closed/indestructible/binary,
-/area/lavaland/surface/outdoors/virtual_domain)
+/area/virtual_domain/fullbright)
 "kG" = (
 /obj/structure/table,
 /obj/machinery/reagentgrinder,
@@ -395,19 +364,8 @@
 /turf/open/misc/asteroid/basalt/lava_land_surface,
 /area/virtual_domain/fullbright)
 "ug" = (
-/obj/structure/closet/secure_closet{
-	icon_state = "cabinet";
-	name = "bartender's closet";
-	req_access = list("bar")
-	},
-/obj/item/clothing/shoes/sandal{
-	desc = "A very fashionable pair of flip-flops.";
-	name = "flip-flops"
-	},
-/obj/item/clothing/neck/beads,
-/obj/item/clothing/glasses/sunglasses/reagent,
-/obj/item/clothing/suit/costume/hawaiian,
 /obj/machinery/light/small/directional/east,
+/obj/structure/closet/secure_closet/bar/lavaland_bartender_clothes,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
 "uk" = (
@@ -459,9 +417,9 @@
 /area/virtual_domain/fullbright)
 "vN" = (
 /obj/structure/table/wood,
-/obj/item/reagent_containers/pill/morphine,
-/obj/item/reagent_containers/pill/morphine,
-/obj/item/reagent_containers/pill/morphine,
+/obj/item/reagent_containers/applicator/pill/morphine,
+/obj/item/reagent_containers/applicator/pill/morphine,
+/obj/item/reagent_containers/applicator/pill/morphine,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
 "vT" = (
@@ -529,23 +487,18 @@
 /area/virtual_domain/fullbright)
 "xR" = (
 /obj/structure/window/reinforced/spawner/directional/east,
-/obj/structure/window/reinforced/spawner/directional/north{
-	layer = 2.9
-	},
+/obj/structure/window/reinforced/spawner/directional/north,
 /obj/structure/chair/stool/directional/south,
 /obj/item/storage/backpack/duffelbag,
 /obj/item/clothing/under/shorts/red,
 /obj/item/clothing/glasses/sunglasses,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
-"xW" = (
-/turf/open/space/basic,
-/area/space)
 "ya" = (
 /obj/structure/table/wood,
-/obj/item/reagent_containers/pill/zoom,
-/obj/item/reagent_containers/pill/zoom,
-/obj/item/reagent_containers/pill/zoom,
+/obj/item/reagent_containers/applicator/pill/zoom,
+/obj/item/reagent_containers/applicator/pill/zoom,
+/obj/item/reagent_containers/applicator/pill/zoom,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
 "yi" = (
@@ -695,7 +648,7 @@
 /area/virtual_domain/fullbright)
 "CA" = (
 /obj/structure/window/reinforced/spawner/directional/east,
-/obj/effect/mob_spawn/ghost_role/human/beach/lifeguard,
+/obj/effect/mob_spawn/ghost_role/human/virtual_domain/beach/lifeguard,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
 "CO" = (
@@ -723,9 +676,7 @@
 /turf/closed/wall/mineral/sandstone,
 /area/virtual_domain/fullbright)
 "Em" = (
-/obj/item/reagent_containers/condiment/enzyme{
-	layer = 5
-	},
+/obj/item/reagent_containers/condiment/enzyme,
 /obj/item/reagent_containers/cup/beaker{
 	pixel_x = 5
 	},
@@ -855,8 +806,9 @@
 /turf/open/misc/beach/sand,
 /area/virtual_domain/fullbright)
 "Kd" = (
-/obj/structure/sign/warning/secure_area,
-/turf/closed/wall/mineral/sandstone,
+/obj/effect/mapping_helpers/broken_floor,
+/obj/structure/sign/warning/secure_area/directional/west,
+/turf/open/floor/plating,
 /area/virtual_domain/fullbright)
 "KH" = (
 /obj/structure/mineral_door/wood{
@@ -897,7 +849,7 @@
 /turf/open/misc/beach/sand,
 /area/virtual_domain/fullbright)
 "Nw" = (
-/obj/item/bedsheet/dorms{
+/obj/effect/spawner/random/bedsheet{
 	dir = 4
 	},
 /obj/structure/bed{
@@ -924,7 +876,7 @@
 /turf/open/floor/light/colour_cycle/dancefloor_a,
 /area/virtual_domain/fullbright)
 "OE" = (
-/obj/effect/mob_spawn/ghost_role/human/beach{
+/obj/effect/mob_spawn/ghost_role/human/virtual_domain/beach{
 	dir = 4
 	},
 /turf/open/floor/wood,
@@ -955,7 +907,7 @@
 /area/virtual_domain/fullbright)
 "Pg" = (
 /obj/structure/sign/poster/official/high_class_martini/directional/west,
-/obj/effect/mob_spawn/ghost_role/human/bartender{
+/obj/effect/mob_spawn/ghost_role/human/virtual_domain/beach/bartender{
 	dir = 4
 	},
 /turf/open/floor/wood,
@@ -1054,9 +1006,13 @@
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
 "VA" = (
-/obj/machinery/computer/slot_machine,
+/obj/effect/spawner/random/entertainment/slot_machine,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
+"VE" = (
+/obj/effect/baseturf_helper/virtual_domain,
+/turf/closed/mineral/random/volcanic,
+/area/lavaland/surface/outdoors/virtual_domain)
 "VH" = (
 /obj/machinery/light/directional/west,
 /turf/open/floor/wood,
@@ -1161,7 +1117,7 @@
 /area/virtual_domain/fullbright)
 "Zt" = (
 /obj/structure/table/wood,
-/obj/item/reagent_containers/pill/morphine,
+/obj/item/reagent_containers/applicator/pill/morphine,
 /obj/item/storage/fancy/donut_box,
 /turf/open/floor/wood,
 /area/virtual_domain/fullbright)
@@ -1171,42 +1127,42 @@ pr
 pr
 pr
 pr
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
 kv
 "}
 (2,1,1) = {"
@@ -1214,7 +1170,7 @@ pr
 pr
 pr
 pr
-iz
+kv
 Al
 Al
 Al
@@ -1249,15 +1205,15 @@ Al
 Al
 Al
 Al
-Al
-iz
+VE
+kv
 "}
 (3,1,1) = {"
 pr
 pr
 pr
 pr
-iz
+kv
 Al
 gl
 gl
@@ -1293,14 +1249,14 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (4,1,1) = {"
 pr
 pr
 pr
 pr
-iz
+kv
 Al
 gl
 gl
@@ -1336,14 +1292,14 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (5,1,1) = {"
 pr
 pr
 pr
 pr
-iz
+kv
 Al
 gl
 gl
@@ -1379,14 +1335,14 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (6,1,1) = {"
 pr
 pr
 pr
 pr
-iz
+kv
 Al
 gl
 gl
@@ -1422,14 +1378,14 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (7,1,1) = {"
 pr
 pr
 pr
 pr
-iz
+kv
 Al
 gl
 gl
@@ -1465,14 +1421,14 @@ ml
 FM
 gl
 Al
-iz
+kv
 "}
 (8,1,1) = {"
 pr
 pr
 pr
 pr
-iz
+kv
 Al
 gl
 gl
@@ -1508,14 +1464,14 @@ ml
 ml
 gl
 Al
-iz
+kv
 "}
 (9,1,1) = {"
 pr
 pr
 pr
 pr
-iz
+kv
 Al
 gl
 gl
@@ -1551,14 +1507,14 @@ ml
 ml
 gl
 Al
-iz
+kv
 "}
 (10,1,1) = {"
 pr
 pr
 pr
 pr
-iz
+kv
 Al
 Al
 Al
@@ -1594,14 +1550,14 @@ ml
 ml
 gl
 Al
-iz
+kv
 "}
 (11,1,1) = {"
-iz
-iz
-iz
-iz
-iz
+kv
+kv
+kv
+kv
+kv
 Al
 Al
 Al
@@ -1637,10 +1593,10 @@ ml
 ml
 gl
 Al
-iz
+kv
 "}
 (12,1,1) = {"
-iz
+kv
 Al
 Al
 Al
@@ -1654,7 +1610,7 @@ LD
 LD
 Fn
 Fn
-Kd
+Fn
 Fn
 Fn
 bQ
@@ -1680,10 +1636,10 @@ ml
 ml
 gl
 Al
-iz
+kv
 "}
 (13,1,1) = {"
-iz
+kv
 Al
 Fn
 Fn
@@ -1697,7 +1653,7 @@ pT
 LD
 EC
 LD
-pT
+Kd
 PM
 wD
 wD
@@ -1723,10 +1679,10 @@ ml
 sT
 gl
 Al
-iz
+kv
 "}
 (14,1,1) = {"
-iz
+kv
 Al
 Fn
 VA
@@ -1766,10 +1722,10 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (15,1,1) = {"
-iz
+kv
 Al
 Fn
 VA
@@ -1809,10 +1765,10 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (16,1,1) = {"
-iz
+kv
 Al
 Fn
 pC
@@ -1852,10 +1808,10 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (17,1,1) = {"
-iz
+kv
 Al
 Fn
 Mw
@@ -1895,10 +1851,10 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (18,1,1) = {"
-iz
+kv
 Al
 Fn
 Mz
@@ -1938,10 +1894,10 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (19,1,1) = {"
-iz
+kv
 Al
 Fn
 Fn
@@ -1981,10 +1937,10 @@ gl
 gl
 gl
 Al
-iz
+kv
 "}
 (20,1,1) = {"
-iz
+kv
 Al
 Fn
 zU
@@ -2024,10 +1980,10 @@ gl
 Al
 gl
 Al
-iz
+kv
 "}
 (21,1,1) = {"
-iz
+kv
 Al
 Fn
 wD
@@ -2067,10 +2023,10 @@ Al
 Al
 Al
 Al
-iz
+kv
 "}
 (22,1,1) = {"
-iz
+kv
 Al
 Fn
 Fn
@@ -2102,18 +2058,18 @@ Ww
 dj
 Fn
 Al
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
 "}
 (23,1,1) = {"
-iz
+kv
 Al
 xb
 Fn
@@ -2145,7 +2101,7 @@ Ww
 dj
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2153,10 +2109,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (24,1,1) = {"
-iz
+kv
 Al
 xb
 Fn
@@ -2188,7 +2144,7 @@ Ww
 pZ
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2196,10 +2152,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (25,1,1) = {"
-iz
+kv
 Al
 xb
 Fn
@@ -2231,7 +2187,7 @@ Ww
 dj
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2239,10 +2195,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (26,1,1) = {"
-iz
+kv
 Al
 xb
 Fn
@@ -2274,7 +2230,7 @@ Ww
 dj
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2282,10 +2238,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (27,1,1) = {"
-iz
+kv
 Al
 Fn
 Fn
@@ -2317,7 +2273,7 @@ KZ
 dj
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2325,10 +2281,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (28,1,1) = {"
-iz
+kv
 Al
 Fn
 Nr
@@ -2360,7 +2316,7 @@ Ww
 pZ
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2368,10 +2324,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (29,1,1) = {"
-iz
+kv
 Al
 Fn
 wD
@@ -2403,7 +2359,7 @@ Bu
 Xt
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2411,10 +2367,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (30,1,1) = {"
-iz
+kv
 Al
 Fn
 Ds
@@ -2446,7 +2402,7 @@ Fn
 Fn
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2454,10 +2410,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (31,1,1) = {"
-iz
+kv
 Al
 Fn
 TG
@@ -2489,7 +2445,7 @@ Fn
 Al
 Al
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2497,10 +2453,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (32,1,1) = {"
-iz
+kv
 Al
 Fn
 TG
@@ -2532,7 +2488,7 @@ Fn
 Fn
 Al
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2540,10 +2496,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (33,1,1) = {"
-iz
+kv
 Al
 Fn
 EP
@@ -2575,7 +2531,7 @@ OW
 Fn
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2583,10 +2539,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (34,1,1) = {"
-iz
+kv
 Al
 Fn
 Xv
@@ -2618,7 +2574,7 @@ aE
 jg
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2626,10 +2582,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (35,1,1) = {"
-iz
+kv
 Al
 Fn
 Fn
@@ -2661,7 +2617,7 @@ aE
 NM
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2669,10 +2625,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (36,1,1) = {"
-iz
+kv
 Al
 Fn
 kK
@@ -2704,7 +2660,7 @@ aE
 uk
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2712,10 +2668,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (37,1,1) = {"
-iz
+kv
 Al
 Fn
 Ia
@@ -2747,7 +2703,7 @@ Cv
 Fn
 Fn
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2755,10 +2711,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (38,1,1) = {"
-iz
+kv
 Al
 Fn
 tZ
@@ -2790,7 +2746,7 @@ Fn
 Fn
 Al
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2798,10 +2754,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (39,1,1) = {"
-iz
+kv
 Al
 Fn
 Fn
@@ -2833,7 +2789,7 @@ Al
 Al
 Al
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2841,10 +2797,10 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (40,1,1) = {"
-iz
+kv
 Al
 Al
 Al
@@ -2876,7 +2832,7 @@ Al
 Al
 Al
 Al
-iz
+kv
 pr
 pr
 pr
@@ -2884,42 +2840,42 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}
 (41,1,1) = {"
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
-iz
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
+kv
 pr
 pr
 pr
@@ -2927,5 +2883,5 @@ pr
 pr
 pr
 pr
-xW
+pr
 "}

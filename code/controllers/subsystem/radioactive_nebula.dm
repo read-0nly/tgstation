@@ -4,11 +4,21 @@
 /// Controls making objects irradiated when Radioactive Nebula is in effect.
 SUBSYSTEM_DEF(radioactive_nebula)
 	name = "Radioactive Nebula"
-	flags = SS_BACKGROUND
+	dependencies = list(
+		/datum/controller/subsystem/processing/station,
+	)
+	ss_flags = SS_BACKGROUND
 	wait = 30 SECONDS
 
 	VAR_PRIVATE
 		datum/station_trait/nebula/hostile/radiation/radioactive_nebula
+	// List of /atom/movable's that should never be irradiated
+	var/static/list/blacklisted_atoms = typecacheof(list(
+		/atom/movable/mirage_holder,
+		/obj/docking_port,
+		/obj/effect/landmark,
+		/obj/effect/abstract,
+	))
 
 /datum/controller/subsystem/radioactive_nebula/Initialize()
 	radioactive_nebula = locate() in SSstation.station_traits
@@ -26,6 +36,10 @@ SUBSYSTEM_DEF(radioactive_nebula)
 /// Makes something appear irradiated for the purposes of the Radioactive Nebula
 /datum/controller/subsystem/radioactive_nebula/proc/fake_irradiate(atom/movable/target)
 	if (HAS_TRAIT(target, TRAIT_RADIOACTIVE_NEBULA_FAKE_IRRADIATED))
+		return
+
+	/// Things that should not be irradiated, like mirage_holders
+	if(is_type_in_typecache(target, blacklisted_atoms))
 		return
 
 	ADD_TRAIT(target, TRAIT_RADIOACTIVE_NEBULA_FAKE_IRRADIATED, REF(src))
@@ -50,9 +64,10 @@ SUBSYSTEM_DEF(radioactive_nebula)
 /// Loop through radioactive space (with lag checks) and make it all radioactive!
 /datum/controller/subsystem/radioactive_nebula/proc/irradiate_everything()
 	for (var/area/area as anything in get_areas(radioactive_nebula.radioactive_areas))
-		for (var/turf/turf as anything in area.get_contained_turfs())
-			for (var/atom/movable/target as anything in turf)
-				fake_irradiate(target)
+		for (var/list/zlevel_turfs as anything in area.get_zlevel_turf_lists())
+			for (var/turf/area_turf as anything in zlevel_turfs)
+				for (var/atom/movable/target as anything in area_turf)
+					fake_irradiate(target)
 
 			CHECK_TICK
 

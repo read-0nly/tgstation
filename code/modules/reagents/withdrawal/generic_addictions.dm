@@ -1,6 +1,8 @@
 ///Opioids
 /datum/addiction/opioids
 	name = "opioid"
+	description = "Patient has developed a dependence on opioid substances."
+	symptoms = "Expresses a desire for painkillers, and when in withdrawl, experiences drowsiness, high blood pressure, and nausea."
 	withdrawal_stage_messages = list("I feel aches in my bodies..", "I need some pain relief...", "It aches all over...I need some opioids!")
 
 /datum/addiction/opioids/withdrawal_stage_1_process(mob/living/carbon/affected_carbon, seconds_per_tick)
@@ -26,6 +28,8 @@
 
 /datum/addiction/stimulants
 	name = "stimulant"
+	description = "Patient has developed a dependence on stimulant substances."
+	symptoms = "Expresses a desire for stimulants, and when in withdrawal, experiences fatigue, slowness, and difficulty concentrating."
 	withdrawal_stage_messages = list("You feel a bit tired...You could really use a pick me up.", "You are getting a bit woozy...", "So...Tired...")
 
 /datum/addiction/stimulants/withdrawal_enters_stage_1(mob/living/carbon/affected_carbon)
@@ -49,6 +53,8 @@
 ///Alcohol
 /datum/addiction/alcohol
 	name = "alcohol"
+	description = "Patient has developed a dependence on alcohol."
+	symptoms = "Expresses a desire for alcoholic beverages, and when in withdrawal, experiences jitteriness, hallucinations, and potentially seizures."
 	withdrawal_stage_messages = list("I could use a drink...", "Maybe the bar is still open?..", "God I need a drink!")
 
 /datum/addiction/alcohol/withdrawal_stage_1_process(mob/living/carbon/affected_carbon, seconds_per_tick)
@@ -69,13 +75,15 @@
 
 /datum/addiction/hallucinogens
 	name = "hallucinogen"
+	description = "Patient has developed a dependence on hallucinogenic substances."
+	symptoms = "Expresses a desire for hallucinogens, and when in withdrawal, experiences feelings of emptiness, difficulty seeing, and disconnection from reality."
 	withdrawal_stage_messages = list("I feel so empty...", "I wonder what the machine elves are up to?..", "I need to see the beautiful colors again!!")
 
 /datum/addiction/hallucinogens/withdrawal_enters_stage_2(mob/living/carbon/affected_carbon)
 	. = ..()
 	var/atom/movable/plane_master_controller/game_plane_master_controller = affected_carbon.hud_used.plane_master_controllers[PLANE_MASTERS_GAME]
-	game_plane_master_controller.add_filter("hallucinogen_wave", 10, wave_filter(300, 300, 3, 0, WAVE_SIDEWAYS))
 	game_plane_master_controller.add_filter("hallucinogen_blur", 10, angular_blur_filter(0, 0, 3))
+	game_plane_master_controller.add_filter("hallucinogen_wave", 10, wave_filter(300, 300, 3, 0, WAVE_SIDEWAYS))
 
 
 /datum/addiction/hallucinogens/withdrawal_enters_stage_3(mob/living/carbon/affected_carbon)
@@ -91,6 +99,9 @@
 
 /datum/addiction/maintenance_drugs
 	name = "maintenance drug"
+	description = "Patient has developed a dependence on maintenance drugs."
+	symptoms = "Expresses a desire for maintenance drugs, and when in withdrawal, experiences various adaptions \
+		such as light sensitivity, numbness, changes to taste, enhanced hair growth, and greater low light vision."
 	withdrawal_stage_messages = list("", "", "")
 
 /datum/addiction/maintenance_drugs/withdrawal_enters_stage_1(mob/living/carbon/affected_carbon)
@@ -111,7 +122,7 @@
 		to_chat(affected_human, span_warning("Your chin itches."))
 		affected_human.set_facial_hairstyle("Beard (Full)", update = TRUE)
 	//Only like gross food
-	var/obj/item/organ/internal/tongue/tongue = affected_carbon.get_organ_slot(ORGAN_SLOT_TONGUE)
+	var/obj/item/organ/tongue/tongue = affected_carbon.get_organ_slot(ORGAN_SLOT_TONGUE)
 	if(!tongue)
 		return
 	tongue.liked_foodtypes = GROSS
@@ -124,7 +135,7 @@
 		return
 	to_chat(affected_carbon, span_warning("You feel yourself adapt to the darkness."))
 	var/mob/living/carbon/human/affected_human = affected_carbon
-	var/obj/item/organ/internal/eyes/empowered_eyes = affected_human.get_organ_by_type(/obj/item/organ/internal/eyes)
+	var/obj/item/organ/eyes/empowered_eyes = affected_human.get_organ_by_type(/obj/item/organ/eyes)
 	if(empowered_eyes)
 		ADD_TRAIT(affected_human, TRAIT_NIGHT_VISION, "maint_drug_addiction")
 		empowered_eyes?.refresh()
@@ -146,7 +157,7 @@
 	. = ..()
 	affected_carbon.remove_status_effect(/datum/status_effect/grouped/screwy_hud/fake_healthy, type)
 	//restore tongue's tastes
-	var/obj/item/organ/internal/tongue/tongue = affected_carbon.get_organ_slot(ORGAN_SLOT_TONGUE)
+	var/obj/item/organ/tongue/tongue = affected_carbon.get_organ_slot(ORGAN_SLOT_TONGUE)
 	if(tongue)
 		tongue.liked_foodtypes = initial(tongue.liked_foodtypes)
 		tongue.disliked_foodtypes = initial(tongue.disliked_foodtypes)
@@ -155,12 +166,15 @@
 		return
 	var/mob/living/carbon/human/affected_human = affected_carbon
 	REMOVE_TRAIT(affected_human, TRAIT_NIGHT_VISION, "maint_drug_addiction")
-	var/obj/item/organ/internal/eyes/eyes = affected_human.get_organ_by_type(/obj/item/organ/internal/eyes)
+	var/obj/item/organ/eyes/eyes = affected_human.get_organ_by_type(/obj/item/organ/eyes)
 	eyes?.refresh()
 
 ///Makes you a hypochondriac - I'd like to call it hypochondria, but "I could use some hypochondria" doesn't work
 /datum/addiction/medicine
 	name = "medicine"
+	description = "Patient has developed a dependence on medicine, similar to that of Hypochondria."
+	symptoms = "Expresses a need for medication despite being otherwise healthy, and when in withdrawal, \
+		experiences coughing fits, hallucinations, and distorted health perceptions."
 	withdrawal_stage_messages = list("", "", "")
 	/// Weakref to the "fake alert" hallucination we're giving to the addicted
 	var/datum/weakref/fake_alert_ref
@@ -183,7 +197,7 @@
 
 /datum/addiction/medicine/withdrawal_stage_1_process(mob/living/carbon/affected_carbon, seconds_per_tick)
 	. = ..()
-	if(SPT_PROB(10, seconds_per_tick))
+	if(SPT_PROB(1, seconds_per_tick))
 		affected_carbon.emote("cough")
 
 /datum/addiction/medicine/withdrawal_enters_stage_2(mob/living/carbon/affected_carbon)
@@ -195,7 +209,7 @@
 	if(!HAS_TRAIT(affected_carbon, TRAIT_RESISTCOLD))
 		possibilities += /datum/hallucination/fake_alert/cold
 
-	var/obj/item/organ/internal/lungs/lungs = affected_carbon.get_organ_slot(ORGAN_SLOT_LUNGS)
+	var/obj/item/organ/lungs/lungs = affected_carbon.get_organ_slot(ORGAN_SLOT_LUNGS)
 	if(lungs)
 		if(lungs.safe_oxygen_min)
 			possibilities += /datum/hallucination/fake_alert/need_oxygen
@@ -216,6 +230,9 @@
 
 /datum/addiction/medicine/withdrawal_stage_2_process(mob/living/carbon/affected_carbon, seconds_per_tick)
 	. = ..()
+	if(SPT_PROB(2, seconds_per_tick))
+		affected_carbon.emote("cough")
+
 	var/datum/hallucination/fake_health_doll/hallucination = health_doll_ref?.resolve()
 	if(QDELETED(hallucination))
 		health_doll_ref = null
@@ -235,13 +252,12 @@
 
 /datum/addiction/medicine/withdrawal_stage_3_process(mob/living/carbon/affected_carbon, seconds_per_tick)
 	. = ..()
+	if(SPT_PROB(5, seconds_per_tick))
+		affected_carbon.emote("cough")
+
 	var/datum/hallucination/fake_health_doll/hallucination = health_doll_ref?.resolve()
 	if(!QDELETED(hallucination) && SPT_PROB(5, seconds_per_tick))
 		hallucination.increment_fake_damage()
-		return
-
-	if(SPT_PROB(15, seconds_per_tick))
-		affected_carbon.emote("cough")
 		return
 
 	if(SPT_PROB(65, seconds_per_tick))
@@ -270,6 +286,8 @@
 ///Nicotine
 /datum/addiction/nicotine
 	name = "nicotine"
+	description = "Patient has developed a dependence on nicotine."
+	symptoms = "Expresses a desire for nicotine products, and when in withdrawal, experiences jitteriness, coughing, and difficulty concentrating."
 	addiction_relief_treshold = MIN_NICOTINE_ADDICTION_REAGENT_AMOUNT //much less because your intake is probably from ciggies
 	withdrawal_stage_messages = list("Feel like having a smoke...", "Getting antsy. Really need a smoke now.", "I can't take it! Need a smoke NOW!")
 
@@ -283,11 +301,11 @@
 /datum/addiction/nicotine/withdrawal_stage_2_process(mob/living/carbon/affected_carbon, seconds_per_tick)
 	. = ..()
 	affected_carbon.set_jitter_if_lower(20 SECONDS * seconds_per_tick)
-	if(SPT_PROB(10, seconds_per_tick))
+	if(SPT_PROB(2, seconds_per_tick))
 		affected_carbon.emote("cough")
 
 /datum/addiction/nicotine/withdrawal_stage_3_process(mob/living/carbon/affected_carbon, seconds_per_tick)
 	. = ..()
 	affected_carbon.set_jitter_if_lower(30 SECONDS * seconds_per_tick)
-	if(SPT_PROB(15, seconds_per_tick))
+	if(SPT_PROB(5, seconds_per_tick))
 		affected_carbon.emote("cough")

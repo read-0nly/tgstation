@@ -9,7 +9,7 @@
 	///Connected techweb node the server is connected to.
 	var/datum/techweb/stored_research
 
-/obj/machinery/computer/rdservercontrol/LateInitialize()
+/obj/machinery/computer/rdservercontrol/post_machine_initialize()
 	. = ..()
 	if(!CONFIG_GET(flag/no_default_techweb_link) && !stored_research)
 		CONNECT_TO_RND_SERVER_ROUNDSTART(stored_research, src)
@@ -52,16 +52,17 @@
 			))
 
 		for(var/obj/machinery/computer/rdconsole/console as anything in stored_research.consoles_accessing)
+			var/obj/item/circuitboard/computer/rdconsole/console_board = console.circuit
 			data["consoles"] += list(list(
 				"console_name" = console,
 				"console_location" = get_area(console),
-				"console_locked" = console.locked,
+				"console_locked" = console_board.locked,
 				"console_ref" = REF(console),
 			))
 
 	return data
 
-/obj/machinery/computer/rdservercontrol/ui_act(action, params)
+/obj/machinery/computer/rdservercontrol/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
 	if(.)
 		return TRUE
@@ -79,7 +80,8 @@
 			return TRUE
 		if("lock_console")
 			var/obj/machinery/computer/rdconsole/console_selected = locate(params["selected_console"]) in stored_research.consoles_accessing
+			var/obj/item/circuitboard/computer/rdconsole/console_board = console_selected.circuit
 			if(!console_selected)
 				return FALSE
-			console_selected.locked = !console_selected.locked
+			console_board.locked = !console_board.locked
 			return TRUE

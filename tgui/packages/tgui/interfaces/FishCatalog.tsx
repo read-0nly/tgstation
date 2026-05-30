@@ -1,10 +1,10 @@
-import { sortBy } from 'common/collections';
-import { flow } from 'common/fp';
-import { classes } from 'common/react';
-import { capitalize } from 'common/string';
+import { sortBy } from 'es-toolkit';
+import { useState } from 'react';
+import { Box, Button, LabeledList, Section, Stack } from 'tgui-core/components';
+import { classes } from 'tgui-core/react';
+import { capitalize } from 'tgui-core/string';
 
-import { useBackend, useLocalState } from '../backend';
-import { Box, Button, LabeledList, Section, Stack } from '../components';
+import { useBackend } from '../backend';
 import { Window } from '../layouts';
 
 type FishingTips = {
@@ -27,6 +27,7 @@ type FishInfo = {
   weight: string;
   size: string;
   icon: string;
+  beauty: string;
 };
 
 type FishCatalogData = {
@@ -37,13 +38,8 @@ type FishCatalogData = {
 export const FishCatalog = (props) => {
   const { act, data } = useBackend<FishCatalogData>();
   const { fish_info, sponsored_by } = data;
-  const fish_by_name = flow([sortBy((fish: FishInfo) => fish.name)])(
-    fish_info || [],
-  );
-  const [currentFish, setCurrentFish] = useLocalState<FishInfo | null>(
-    'currentFish',
-    null,
-  );
+  const fish_by_name = sortBy(fish_info || [], [(fish: FishInfo) => fish.name]);
+  const [currentFish, setCurrentFish] = useState<FishInfo | null>(null);
   return (
     <Window width={500} height={300}>
       <Window.Content>
@@ -72,7 +68,7 @@ export const FishCatalog = (props) => {
               title={
                 currentFish
                   ? capitalize(currentFish.name)
-                  : sponsored_by + ' Fish Index'
+                  : `${sponsored_by} Fish Index`
               }
             >
               {currentFish && (
@@ -96,7 +92,10 @@ export const FishCatalog = (props) => {
                     {currentFish.size} cm
                   </LabeledList.Item>
                   <LabeledList.Item label="Average weight">
-                    {currentFish.weight} g
+                    {currentFish.weight} kiloclam
+                  </LabeledList.Item>
+                  <LabeledList.Item label="Aquarium Beauty Score">
+                    {currentFish.beauty}
                   </LabeledList.Item>
                   <LabeledList.Item label="Fishing and Aquarium tips">
                     <LabeledList>

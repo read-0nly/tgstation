@@ -1,8 +1,3 @@
-//Luma coefficients suggested for HDTVs. If you change these, make sure they add up to 1.
-#define LUMA_R 0.213
-#define LUMA_G 0.715
-#define LUMA_B 0.072
-
 /// Datum which stores information about a matrix decomposed with decompose().
 /datum/decompose_matrix
 	///?
@@ -40,8 +35,7 @@
 	decompose_matrix.rotation = arctan(cossine, sine) * flip_sign
 
 /matrix/proc/TurnTo(old_angle, new_angle)
-	. = new_angle - old_angle
-	Turn(.) //BYOND handles cases such as -270, 360, 540 etc. DOES NOT HANDLE 180 TURNS WELL, THEY TWEEN AND LOOK LIKE SHIT
+	return Turn(new_angle - old_angle) //BYOND handles cases such as -270, 360, 540 etc. DOES NOT HANDLE 180 TURNS WELL, THEY TWEEN AND LOOK LIKE SHIT
 
 /**
  * Shear the transform on either or both axes.
@@ -86,6 +80,10 @@ c f 1
 ///The Y pixel offset of this matrix
 /matrix/proc/get_y_shift()
 	. = f
+
+///The angle of this matrix
+/matrix/proc/get_angle()
+	. = -ATAN2(a,d)
 
 /////////////////////
 // COLOUR MATRICES //
@@ -178,7 +176,7 @@ round(cos_inv_third+sqrt3_sin, 0.001), round(cos_inv_third-sqrt3_sin, 0.001), ro
 	if(!color)
 		return COLOR_MATRIX_IDENTITY
 	if(istext(color))
-		var/list/L = ReadRGB(color)
+		var/list/L = rgb2num(color)
 		if(!L)
 			var/message = "Invalid/unsupported color ([color]) argument in color_to_full_rgba_matrix()"
 			if(return_identity_on_fail)
@@ -193,7 +191,7 @@ round(cos_inv_third+sqrt3_sin, 0.001), round(cos_inv_third-sqrt3_sin, 0.001), ro
 		if(3 to 5) // row-by-row hexadecimals
 			. = list()
 			for(var/a in 1 to L.len)
-				var/list/rgb = ReadRGB(L[a])
+				var/list/rgb = rgb2num(L[a])
 				for(var/b in rgb)
 					. += b/255
 				if(length(rgb) % 4) // RGB has no alpha instruction
@@ -218,7 +216,3 @@ round(cos_inv_third+sqrt3_sin, 0.001), round(cos_inv_third-sqrt3_sin, 0.001), ro
 				stack_trace(message)
 				return COLOR_MATRIX_IDENTITY
 			CRASH(message)
-
-#undef LUMA_R
-#undef LUMA_G
-#undef LUMA_B

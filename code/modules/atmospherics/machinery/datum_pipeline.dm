@@ -131,7 +131,7 @@
 
 	/**
 	 *  For a machine to properly "connect" to a pipeline and share gases,
-	 *  the pipeline needs to acknowledge a gas mixture as it's member.
+	 *  the pipeline needs to acknowledge a gas mixture as its member.
 	 *  This is currently handled by the other_airs list in the pipeline datum.
 	 *
 	 *	Other_airs itself is populated by gas mixtures through the parents list that each machineries have.
@@ -259,7 +259,7 @@
 	var/volume_sum = 0
 
 	var/static/process_id = 0
-	process_id = (process_id + 1) % (SHORT_REAL_LIMIT - 1)
+	process_id = WRAP_UID(process_id + 1)
 
 	for(var/datum/gas_mixture/gas_mixture as anything in gas_mixture_list)
 		// Ensure we never walk the same mix twice
@@ -298,9 +298,10 @@
 //--------------------
 // GAS VISUALS STUFF
 //
-// If I could have gotten layer filters to obey the RESET_COLOR appearance flag I would have used that here
-// so that only a single overlay object needs to exist for all pipelines per icon file. It shouldn't be too
-// hard to switch over to that if it becomes possible in the future or some other equivalent feature is added.
+// Gas visuals use direct color + alpha on the gas_visual object rather than
+// a color filter + KEEP_APART.
+// Color filters are expensive.
+// KEEP_APART forces a separate render.
 
 /**
  * Used to create and/or get the gas visual overlay created using the given icon file.
@@ -333,7 +334,7 @@
 		var/gas_weight = air.gases[gas_path][MOLES]
 		if(!gas_weight)
 			continue
-		var/gas_color = RGBtoHSV(initial(gas_path.primary_color))
+		var/gas_color = initial(gas_path.primary_color)
 		current_weight += gas_weight
 		if(!current_color)
 			current_color = gas_color
@@ -341,36 +342,23 @@
 			current_color = BlendHSV(current_color, gas_color, gas_weight / current_weight)
 
 	if(!current_color)
-		current_color = "#000000"
+		current_color = COLOR_BLACK
 	else
 		// Empty weight is prety much arbitrary, just tuned to make the color change from black reasonably quickly without hitting max color immediately
 		var/empty_weight = (air.volume * 1.5 - current_weight) / 10
 		if(empty_weight > 0)
-			current_color = BlendHSV("#000000", current_color, current_weight / (empty_weight + current_weight))
-
-	current_color = HSVtoRGB(current_color)
+			current_color = BlendHSV(COLOR_BLACK, current_color, current_weight / (empty_weight + current_weight))
 
 	if(gasmix_color != current_color)
 		gasmix_color = current_color
 		UpdateGasVisuals()
 
 /obj/effect/abstract/gas_visual
-	appearance_flags  = RESET_COLOR | KEEP_APART
+	appearance_flags = RESET_COLOR
 	vis_flags = VIS_INHERIT_ICON_STATE | VIS_INHERIT_LAYER | VIS_INHERIT_PLANE | VIS_INHERIT_ID
-	var/current_color
-	var/color_filter
-
-/obj/effect/abstract/gas_visual/Initialize(mapload)
-	. = ..()
-	color_filter = filter(type="color", color=matrix())
-	filters += color_filter
-	color_filter = filters[filters.len]
-	if(current_color)
-		animate(color_filter, color=current_color, time=5)
+	color = COLOR_BLACK
 
 /obj/effect/abstract/gas_visual/proc/ChangeColor(new_color)
-	current_color = new_color
-	if(isnull(color_filter))
-		// Called before init
-		return
-	animate(color_filter, time=5, color=new_color)
+	if(!new_color)
+		new_color = COLOR_BLACK
+	animate(src, color = new_color, time = 0.5 SECONDS)

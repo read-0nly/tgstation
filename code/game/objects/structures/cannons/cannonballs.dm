@@ -29,7 +29,7 @@
 	name = "explosive shellballs"
 	singular_name = "explosive shellball"
 	desc = "An explosive anti-materiel and counter-battery projectile cannonball. Makes great work out of any wall, for easy entrances."
-	color = "#FF0000"
+	color = COLOR_RED
 	merge_type = /obj/item/stack/cannonball/shellball
 	projectile_type = /obj/projectile/bullet/cannonball/explosive
 
@@ -71,6 +71,7 @@
 	base_icon_state = "trashballs"
 	merge_type = /obj/item/stack/cannonball/trashball
 	projectile_type = /obj/projectile/bullet/cannonball/trashball
+	custom_materials = list(/datum/material/alloy/plasteel = SHEET_MATERIAL_AMOUNT)
 
 /obj/item/stack/cannonball/trashball/four
 	amount = 4

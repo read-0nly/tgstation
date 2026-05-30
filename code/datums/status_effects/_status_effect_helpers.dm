@@ -13,9 +13,7 @@
 /mob/living/proc/apply_status_effect(datum/status_effect/new_effect, ...)
 	RETURN_TYPE(/datum/status_effect)
 
-	// The arguments we pass to the start effect. The 1st argument is this mob.
 	var/list/arguments = args.Copy()
-	arguments[1] = src
 
 	// If the status effect we're applying doesn't allow multiple effects, we need to handle it
 	if(initial(new_effect.status_type) != STATUS_EFFECT_MULTIPLE)
@@ -38,6 +36,9 @@
 					existing_effect.refresh(arglist(arguments))
 					return
 
+	// For the new effect the 1st argument is this mob
+	arguments[1] = src
+
 	// Create the status effect with our mob + our arguments
 	var/datum/status_effect/new_instance = new new_effect(arguments)
 	if(!QDELETED(new_instance))
@@ -56,7 +57,7 @@
 
 	. = FALSE
 	for(var/datum/status_effect/existing_effect as anything in status_effects)
-		if(existing_effect.id == initial(removed_effect.id) && existing_effect.before_remove(arguments))
+		if(existing_effect.id == initial(removed_effect.id) && existing_effect.before_remove(arglist(arguments)))
 			qdel(existing_effect)
 			. = TRUE
 
@@ -65,7 +66,7 @@
 /**
  * Checks if this mob has a status effect that shares the passed effect's ID
  *
- * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not it's typepath
+ * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not its typepath
  *
  * Returns an instance of a status effect, or NULL if none were found.
  */
@@ -84,11 +85,22 @@
 
 	return null
 
+///Gets every status effect of an ID and returns all of them in a list, rather than the individual 'has_status_effect'
+/mob/living/proc/get_all_status_effect_of_id(datum/status_effect/checked_effect)
+	RETURN_TYPE(/list/datum/status_effect)
+
+	var/list/all_effects_of_type = list()
+	for(var/datum/status_effect/present_effect as anything in status_effects)
+		if(present_effect.id == initial(checked_effect.id))
+			all_effects_of_type += present_effect
+
+	return all_effects_of_type
+
 /**
  * Checks if this mob has a status effect that shares the passed effect's ID
  * and has the passed sources are in its list of sources (ONLY works for grouped efects!)
  *
- * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not it's typepath
+ * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not its typepath
  *
  * Returns an instance of a status effect, or NULL if none were found.
  */
@@ -117,7 +129,7 @@
 /**
  * Returns a list of all status effects that share the passed effect type's ID
  *
- * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not it's typepath
+ * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not its typepath
  *
  * Returns a list
  */

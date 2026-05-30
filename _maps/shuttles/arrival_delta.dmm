@@ -39,6 +39,7 @@
 /area/shuttle/arrival)
 "ah" = (
 /obj/effect/spawner/structure/window/reinforced/shuttle,
+/obj/structure/fans/tiny/invisible,
 /turf/open/floor/plating,
 /area/shuttle/arrival)
 "ai" = (
@@ -156,6 +157,7 @@
 /obj/effect/turf_decal/stripes/line{
 	dir = 4
 	},
+/obj/structure/fans/tiny,
 /turf/open/floor/iron/white,
 /area/shuttle/arrival)
 "ap" = (
@@ -198,10 +200,6 @@
 /obj/structure/flora/bush/ferny/style_random,
 /obj/structure/window/reinforced/shuttle,
 /turf/open/floor/grass,
-/area/shuttle/arrival)
-"az" = (
-/obj/structure/sign/nanotrasen,
-/turf/closed/wall/mineral/titanium,
 /area/shuttle/arrival)
 "aC" = (
 /obj/machinery/computer{
@@ -324,7 +322,7 @@
 /turf/open/floor/iron,
 /area/shuttle/arrival)
 "uH" = (
-/obj/machinery/vending/wallmed/directional/north{
+/obj/machinery/wall_healer/free/directional/north{
 	use_power = 0
 	},
 /obj/effect/turf_decal/tile/neutral/fourcorners,
@@ -335,6 +333,7 @@
 /obj/effect/turf_decal/tile/neutral/half/contrasted{
 	dir = 8
 	},
+/obj/structure/sign/nanotrasen/directional/west,
 /turf/open/floor/iron,
 /area/shuttle/arrival)
 "DV" = (
@@ -355,6 +354,7 @@
 /obj/effect/turf_decal/tile/neutral/half/contrasted{
 	dir = 4
 	},
+/obj/structure/sign/nanotrasen/directional/east,
 /turf/open/floor/iron,
 /area/shuttle/arrival)
 "Nn" = (
@@ -393,7 +393,7 @@ ah
 ah
 ah
 ah
-az
+ag
 an
 ag
 ag
@@ -545,7 +545,7 @@ ah
 ah
 ah
 ah
-az
+ag
 an
 ag
 ag

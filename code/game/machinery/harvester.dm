@@ -31,6 +31,9 @@
 	interval = max(max_time,1)
 
 /obj/machinery/harvester/update_icon_state()
+	if(panel_open)
+		icon_state = "[base_icon_state]-o"
+		return ..()
 	if(state_open)
 		icon_state = "[base_icon_state]-open"
 		return ..()
@@ -57,20 +60,16 @@
 	else if(!harvesting)
 		open_machine()
 
-/obj/machinery/harvester/AltClick(mob/user)
-	. = ..()
-	if(!user.can_perform_action(src))
-		return
+/obj/machinery/harvester/click_alt(mob/user)
 	if(panel_open)
 		output_dir = turn(output_dir, -90)
 		to_chat(user, span_notice("You change [src]'s output settings, setting the output to [dir2text(output_dir)]."))
-		return
-	if(!can_interact(user))
-		return
-	if(harvesting || !user || !isliving(user) || state_open)
-		return
-	if(can_harvest())
-		start_harvest()
+		return CLICK_ACTION_SUCCESS
+	if(harvesting || state_open || !can_harvest())
+		return CLICK_ACTION_BLOCKING
+
+	start_harvest()
+	return CLICK_ACTION_SUCCESS
 
 /obj/machinery/harvester/proc/can_harvest()
 	if(!powered() || state_open || !occupant || !iscarbon(occupant))
@@ -80,15 +79,15 @@
 		for(var/obj/item/abiotic_item in carbon_occupant.held_items + carbon_occupant.get_equipped_items())
 			if(!(HAS_TRAIT(abiotic_item, TRAIT_NODROP)))
 				say("Subject may not have abiotic items on.")
-				playsound(src, 'sound/machines/buzz-sigh.ogg', 30, TRUE)
+				playsound(src, 'sound/machines/buzz/buzz-sigh.ogg', 30, TRUE)
 				return
 	if(!(carbon_occupant.mob_biotypes & MOB_ORGANIC))
 		say("Subject is not organic.")
-		playsound(src, 'sound/machines/buzz-sigh.ogg', 30, TRUE)
+		playsound(src, 'sound/machines/buzz/buzz-sigh.ogg', 30, TRUE)
 		return
 	if(!allow_living && !(carbon_occupant.stat == DEAD || HAS_TRAIT(carbon_occupant, TRAIT_FAKEDEATH)))     //I mean, the machines scanners arent advanced enough to tell you're alive
 		say("Subject is still alive.")
-		playsound(src, 'sound/machines/buzz-sigh.ogg', 30, TRUE)
+		playsound(src, 'sound/machines/buzz/buzz-sigh.ogg', 30, TRUE)
 		return
 	return TRUE
 
@@ -100,15 +99,15 @@
 
 	if(carbon_occupant.stat < UNCONSCIOUS)
 		notify_ghosts(
-			"[occupant] is about to be ground up by a malfunctioning organ harvester!",
+			"[carbon_occupant.real_name] is about to be ground up by a malfunctioning organ harvester!",
 			source = src,
 			header = "Gruesome!",
 		)
 
-	operation_order = reverseList(carbon_occupant.bodyparts)   //Chest and head are first in bodyparts, so we invert it to make them suffer more
+	operation_order = reverse_range(carbon_occupant.get_bodyparts())   //Chest and head are first in bodyparts, so we invert it to make them suffer more
 	warming_up = TRUE
 	harvesting = TRUE
-	visible_message(span_notice("The [name] begins warming up!"))
+	visible_message(span_notice("\The [src] begins warming up!"))
 	say("Initializing harvest protocol.")
 	update_appearance()
 	addtimer(CALLBACK(src, PROC_REF(harvest)), interval)
@@ -136,7 +135,7 @@
 				organ_to_remove.forceMove(target) //Some organs, like chest ones, are different so we need to manually move them
 		operation_order.Remove(limb_to_remove)
 		break
-	use_power(active_power_usage)
+	use_energy(active_power_usage)
 	addtimer(CALLBACK(src, PROC_REF(harvest)), interval)
 
 /obj/machinery/harvester/proc/end_harvesting(success = TRUE)
@@ -145,37 +144,25 @@
 	open_machine()
 	if (!success)
 		say("Protocol interrupted. Aborting harvest.")
-		playsound(src, 'sound/machines/buzz-sigh.ogg', 30, TRUE)
+		playsound(src, 'sound/machines/buzz/buzz-sigh.ogg', 30, TRUE)
 	else
 		say("Subject has been successfully harvested.")
 		playsound(src, 'sound/machines/microwave/microwave-end.ogg', 100, FALSE)
 
 /obj/machinery/harvester/screwdriver_act(mob/living/user, obj/item/tool)
-	. = TRUE
-	if(..())
-		return
 	if(occupant)
 		to_chat(user, span_warning("[src] is currently occupied!"))
-		return
+		return ITEM_INTERACT_BLOCKING
 	if(state_open)
 		to_chat(user, span_warning("[src] must be closed to [panel_open ? "close" : "open"] its maintenance hatch!"))
-		return
-	if(default_deconstruction_screwdriver(user, "[initial(icon_state)]-o", initial(icon_state), tool))
-		return
-	return FALSE
+		return ITEM_INTERACT_BLOCKING
+	return default_deconstruction_screwdriver(user, tool)
 
 /obj/machinery/harvester/crowbar_act(mob/living/user, obj/item/tool)
-	if(default_pry_open(tool))
-		return TRUE
-	if(default_deconstruction_crowbar(tool))
-		return TRUE
+	return default_pry_open(user, tool, deconstruct_on_fail = TRUE)
 
-/obj/machinery/harvester/default_pry_open(obj/item/tool) //wew
-	. = !(state_open || panel_open || (obj_flags & NO_DECONSTRUCTION)) && tool.tool_behaviour == TOOL_CROWBAR //We removed is_operational here
-	if(.)
-		tool.play_tool_sound(src, 50)
-		visible_message(span_notice("[usr] pries open \the [src]."), span_notice("You pry open [src]."))
-		open_machine()
+/obj/machinery/harvester/can_crowbar_pry_open()
+	return !state_open && !panel_open
 
 /obj/machinery/harvester/emag_act(mob/user, obj/item/card/emag/emag_card)
 	if(obj_flags & EMAGGED)
@@ -183,7 +170,7 @@
 	obj_flags |= EMAGGED
 	allow_living = TRUE
 	allow_clothing = TRUE
-	balloon_alert(!user, "lifesign scanners overloaded")
+	balloon_alert(user, "lifesign scanners overloaded")
 	return TRUE
 
 /obj/machinery/harvester/container_resist_act(mob/living/user)

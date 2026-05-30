@@ -12,6 +12,7 @@
 	foodtypes = GRAIN | DAIRY | SUGAR
 	food_flags = FOOD_FINGER_FOOD
 	crafting_complexity = FOOD_COMPLEXITY_2
+	crafted_food_buff = /datum/status_effect/food/chilling
 
 /obj/item/food/strawberryicecreamsandwich
 	name = "strawberry ice cream sandwich"
@@ -24,10 +25,10 @@
 		/datum/reagent/consumable/ice = 4,
 	)
 	tastes = list("ice cream" = 2, "berry" = 2)
-	foodtypes = FRUIT | DAIRY | SUGAR
+	foodtypes = GRAIN|FRUIT|DAIRY|SUGAR
 	food_flags = FOOD_FINGER_FOOD
 	crafting_complexity = FOOD_COMPLEXITY_3
-
+	crafted_food_buff = /datum/status_effect/food/chilling
 
 /obj/item/food/spacefreezy
 	name = "space freezy"
@@ -41,8 +42,9 @@
 		/datum/reagent/consumable/nutriment/vitamin = 5,
 	)
 	tastes = list("blue cherries" = 2, "ice cream" = 2)
-	foodtypes = FRUIT | DAIRY | SUGAR
+	foodtypes = GRAIN|FRUIT|DAIRY|SUGAR
 	crafting_complexity = FOOD_COMPLEXITY_3
+	crafted_food_buff = /datum/status_effect/food/chilling
 
 /obj/item/food/spacefreezy/make_edible()
 	. = ..()
@@ -60,8 +62,9 @@
 		/datum/reagent/consumable/nutriment/vitamin = 2,
 	)
 	tastes = list("ice cream" = 1, "banana" = 1)
-	foodtypes = FRUIT | DAIRY | SUGAR
+	foodtypes = GRAIN|FRUIT|DAIRY|SUGAR
 	crafting_complexity = FOOD_COMPLEXITY_3
+	crafted_food_buff = /datum/status_effect/food/chilling
 
 /obj/item/food/sundae/make_edible()
 	. = ..()
@@ -79,8 +82,9 @@
 		/datum/reagent/consumable/nutriment/vitamin = 4,
 	)
 	tastes = list("ice cream" = 1, "banana" = 1, "a bad joke" = 1)
-	foodtypes = FRUIT | DAIRY | SUGAR
+	foodtypes = GRAIN|FRUIT|DAIRY|SUGAR
 	crafting_complexity = FOOD_COMPLEXITY_4
+	crafted_food_buff = /datum/status_effect/food/chilling
 
 /obj/item/food/honkdae/make_edible()
 	. = ..()
@@ -104,6 +108,16 @@
 	foodtypes = SUGAR //We use SUGAR as a base line to act in as junkfood, other wise we use fruit
 	food_flags = FOOD_FINGER_FOOD
 	crafting_complexity = FOOD_COMPLEXITY_2
+	crafted_food_buff = /datum/status_effect/food/chilling
+
+/obj/item/food/snowcones/on_craft_completion(list/components, datum/crafting_recipe/food/current_recipe, atom/crafter)
+	. = ..()
+	// replaces the ice from the input with water
+	reagents.remove_reagent(/datum/reagent/consumable/ice, 15)
+	reagents.add_reagent(/datum/reagent/water, 11)
+	// then add 1u nutriment for free
+	reagents.add_reagent(/datum/reagent/consumable/nutriment, 1)
+	// the juice component will be transferred in from crafting
 
 /obj/item/food/snowcones/lime
 	name = "lime snowcone"
@@ -264,7 +278,7 @@
 	foodtypes = SUGAR
 
 /obj/item/food/snowcones/spacemountainwind
-	name = "Space Mountain Wind snowcone"
+	name = "space mountain wind snowcone"
 	desc = "Space Mountain Wind drizzled over a snowball in a paper cup."
 	icon_state = "mountainwind_sc"
 	food_reagents = list(
@@ -330,6 +344,7 @@
 	foodtypes = DAIRY | SUGAR
 	food_flags = FOOD_FINGER_FOOD
 	crafting_complexity = FOOD_COMPLEXITY_3
+	crafted_food_buff = /datum/status_effect/food/chilling
 
 	var/overlay_state = "creamsicle_o" //This is the edible part of the popsicle.
 	var/bite_states = 4 //This value value is used for correctly setting the bite_consumption to ensure every bite changes the sprite. Do not set to zero.
@@ -343,7 +358,7 @@
 
 /obj/item/food/popsicle/make_edible()
 	. = ..()
-	AddComponent(/datum/component/edible, after_eat = CALLBACK(src, PROC_REF(after_bite)))
+	AddComponentFrom(SOURCE_EDIBLE_INNATE, /datum/component/edible, after_eat = CALLBACK(src, PROC_REF(after_bite)))
 
 /obj/item/food/popsicle/update_overlays()
 	. = ..()
@@ -404,7 +419,7 @@
 	crafting_complexity = FOOD_COMPLEXITY_4
 
 /obj/item/food/popsicle/licorice_creamsicle
-	name = "Void Bar™"
+	name = "\improper Void Bar™"
 	desc = "A salty licorice ice cream. A salty frozen treat."
 	food_reagents = list(
 		/datum/reagent/consumable/nutriment = 4,
@@ -431,12 +446,13 @@
 		/datum/reagent/consumable/sugar = 2,
 	)
 	tastes = list("chopped hazelnuts", "waffle")
-	foodtypes = DAIRY | SUGAR
+	foodtypes = GRAIN|DAIRY|SUGAR
 	venue_value = FOOD_PRICE_NORMAL
 	crafting_complexity = FOOD_COMPLEXITY_3
+	crafted_food_buff = /datum/status_effect/food/chilling
 
 /obj/item/food/popsicle/meatsicle
-	name = "Meatsicle"
+	name = "meatsicle"
 	desc = "A horrific abomination of raw meat, glazed with sugar on a stick, then frozen."
 	food_reagents = list(
 		/datum/reagent/consumable/nutriment = 4,
@@ -447,3 +463,4 @@
 	overlay_state = "meatsicle"
 	foodtypes = RAW | MEAT | SUGAR
 	crafting_complexity = FOOD_COMPLEXITY_4
+	custom_materials = list(/datum/material/meat = MEATSLAB_MATERIAL_AMOUNT)

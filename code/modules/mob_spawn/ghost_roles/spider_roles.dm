@@ -1,5 +1,6 @@
 /obj/structure/spider/eggcluster
 	name = "egg cluster"
+	icon = 'icons/effects/effects.dmi'
 	desc = "There's something alive in there, and sooner or later it's going to find its way out."
 	icon_state = "eggs"
 	/// Mob spawner handling the actual spawn of the spider
@@ -138,8 +139,9 @@
 		if(!silent)
 			to_chat(user, span_warning("\The [src] is not ready to hatch yet!"))
 		return FALSE
+	return TRUE
 
-/obj/effect/mob_spawn/ghost_role/spider/special(mob/living/basic/spider/spawned_mob, mob/mob_possessor)
+/obj/effect/mob_spawn/ghost_role/spider/special(mob/living/basic/spider/spawned_mob, mob/mob_possessor, apply_prefs)
 	. = ..()
 	if (isspider(spawned_mob))
 		spawned_mob.directive = directive
@@ -154,7 +156,7 @@
 	cluster_type = /obj/structure/spider/eggcluster/abnormal
 	potentialspawns = list(
 		/mob/living/basic/spider/growing/spiderling/tank,
-		/mob/living/basic/spider/growing/spiderling/breacher,
+		/mob/living/basic/spider/growing/spiderling/viper,
 	)
 	flash_window = TRUE
 
@@ -165,7 +167,7 @@
 	cluster_type = /obj/structure/spider/eggcluster/enriched
 	potentialspawns = list(
 		/mob/living/basic/spider/growing/spiderling/tarantula,
-		/mob/living/basic/spider/growing/spiderling/viper,
+		/mob/living/basic/spider/growing/spiderling/breacher,
 		/mob/living/basic/spider/growing/spiderling/midwife,
 	)
 	flash_window = TRUE
@@ -176,7 +178,7 @@
 	icon_state = "eggs"
 	you_are_text = "You are a flesh spider."
 	flavour_text = "An abomination of nature set upon the station by changelings. Your only goal is to kill, terrorize, and survive."
-	faction = list()
+	faction = null
 	directive = null
 	cluster_type = /obj/structure/spider/eggcluster/bloody
 	potentialspawns = list(
@@ -196,21 +198,12 @@
 	)
 	flash_window = TRUE
 
-/**
- * Makes a ghost into a spider based on the type of egg cluster.
- *
- * Allows a ghost to get a prompt to use the egg cluster to become a spider.
- *
- * Arguments:
- * * user - The ghost attempting to become a spider
- * * newname - If set, renames the mob to this name
- */
-/obj/effect/mob_spawn/ghost_role/spider/create(mob/user, newname)
+/obj/effect/mob_spawn/ghost_role/spider/pre_ghost_take(mob/dead/observer/user)
 	var/chosen_spider = length(potentialspawns) > 1 ? get_radial_choice(user) : potentialspawns[1]
-	if(QDELETED(src) || QDELETED(user) || isnull(chosen_spider))
+	if(isnull(chosen_spider))
 		return FALSE
 	mob_type = chosen_spider
-	return ..()
+	return TRUE
 
 /// Pick a spider type from a radial menu
 /obj/effect/mob_spawn/ghost_role/spider/proc/get_radial_choice(mob/user)
@@ -236,5 +229,5 @@
 		display_spiders[initial(spider.name)] = option
 	sort_list(display_spiders)
 
-	var/chosen_spider = show_radial_menu(user, egg, display_spiders, radius = 38)
+	var/chosen_spider = show_radial_menu(user, egg, display_spiders, radius = 38, require_near = TRUE)
 	return spider_list[chosen_spider]

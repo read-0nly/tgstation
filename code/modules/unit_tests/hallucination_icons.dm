@@ -19,7 +19,7 @@
 
 	// Test preset delusion hallucinations for invalid image setups
 	for(var/datum/hallucination/delusion/preset/hallucination as anything in subtypesof(/datum/hallucination/delusion/preset))
-		if(initial(hallucination.dynamic_icon))
+		if(initial(hallucination.dynamic_delusion))
 			continue
 		var/icon = initial(hallucination.delusion_icon_file)
 		var/icon_state = initial(hallucination.delusion_icon_state)
@@ -67,6 +67,12 @@
 	var/ice_hallucination_icon = initial(ice_hallucination.ice_icon)
 	var/ice_hallucination_icon_state = initial(ice_hallucination.ice_icon_state)
 	check_hallucination_icon(ice_hallucination, ice_hallucination_icon, ice_hallucination_icon_state)
+
+	// Test malf_apc hallucination for if the hacked apc icon state exists
+	var/datum/hallucination/malf_apc/malf_apc_hallucination = /datum/hallucination/malf_apc
+	var/malf_apc_icon = initial(malf_apc_hallucination.apc_icon)
+	var/malf_apc_icon_state = initial(malf_apc_hallucination.apc_icon_state)
+	check_hallucination_icon(malf_apc_hallucination, malf_apc_icon, malf_apc_icon_state)
 
 /datum/unit_test/hallucination_icons/proc/check_hallucination_icon(hallucination, icon, icon_state)
 	if(!icon)

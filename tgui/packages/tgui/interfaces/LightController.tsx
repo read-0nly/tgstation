@@ -1,7 +1,17 @@
-import { round } from '../../common/math';
-import { BooleanLike, classes } from '../../common/react';
-import { useBackend, useLocalState } from '../backend';
-import { Box, Button, Knob, Section, Slider, Stack, Tabs } from '../components';
+import { useState } from 'react';
+import {
+  Box,
+  Button,
+  Knob,
+  Section,
+  Slider,
+  Stack,
+  Tabs,
+} from 'tgui-core/components';
+import { round } from 'tgui-core/math';
+import { type BooleanLike, classes } from 'tgui-core/react';
+
+import { useBackend } from '../backend';
 import { Window } from '../layouts';
 
 enum Direction {
@@ -50,19 +60,13 @@ export const LightController = (props) => {
     default_category,
     category_ids,
   } = data;
-  const [currentTemplate, setCurrentTemplate] = useLocalState<string>(
-    'currentTemplate',
-    default_id,
-  );
-  const [currentCategory, setCurrentCategory] = useLocalState<string>(
-    'currentCategory',
-    default_category,
-  );
+  const [currentTemplate, setCurrentTemplate] = useState(default_id);
+  const [currentCategory, setCurrentCategory] = useState(default_category);
 
   const category_keys = category_ids ? Object.keys(category_ids) : [];
 
   return (
-    <Window title={light_info.name + ': Lighting'} width={600} height={400}>
+    <Window title={`${light_info.name}: Lighting`} width={600} height={400}>
       <Window.Content scrollable>
         <Stack fill>
           <Stack.Item>
@@ -94,7 +98,7 @@ export const LightController = (props) => {
                       ml={0.1}
                       className={classes([
                         'lights32x32',
-                        'light_fantastic_' + id,
+                        `light_fantastic_${id}`,
                       ])}
                     />
                   </Tabs.Tab>
@@ -196,7 +200,7 @@ const LightControl = (props: LightControlProps) => {
             color="olive"
             minValue={-1}
             maxValue={5}
-            format={(value) => round(value, 2)}
+            format={(value) => round(value, 2).toString()}
             onChange={(e, value) =>
               act('set_power', {
                 value: value,

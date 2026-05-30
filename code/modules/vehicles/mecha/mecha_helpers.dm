@@ -7,8 +7,8 @@
 /obj/vehicle/sealed/mecha/proc/get_charge()
 	return cell?.charge
 
-/obj/vehicle/sealed/mecha/proc/use_power(amount)
-	var/output = get_charge() && cell.use(amount)
+/obj/vehicle/sealed/mecha/proc/use_energy(amount)
+	var/output = cell.use(amount)
 	if (output)
 		diag_hud_set_mechcell()
 	return output
@@ -29,3 +29,8 @@
 		if(istype(I, /obj/item/mecha_parts/mecha_equipment/weapon/ballistic))
 			var/obj/item/mecha_parts/mecha_equipment/weapon/ballistic/gun = I
 			gun.projectiles_cache = gun.projectiles_cache_max
+
+///Called when the mecha with an MMI in it tries opening a door.
+/obj/vehicle/sealed/mecha/proc/retrieve_access(datum/source, list/player_access)
+	SIGNAL_HANDLER
+	player_access += accesses

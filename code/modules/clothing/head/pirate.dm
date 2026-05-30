@@ -5,30 +5,28 @@
 	inhand_icon_state = null
 	dog_fashion = /datum/dog_fashion/head/pirate
 
-/obj/item/clothing/head/costume/pirate
-	var/datum/language/piratespeak/L = new
+/obj/item/clothing/head/costume/pirate/Initialize(mapload)
+	. = ..()
+	AddElement(/datum/element/adjust_fishing_difficulty, -5)
 
 /obj/item/clothing/head/costume/pirate/equipped(mob/user, slot)
 	. = ..()
-	if(!ishuman(user))
+	if(!(slot_flags & slot) || isdrone(user))
 		return
-	if(slot & ITEM_SLOT_HEAD)
-		user.grant_language(/datum/language/piratespeak/, source = LANGUAGE_HAT)
-		to_chat(user, span_boldnotice("You suddenly know how to speak like a pirate!"))
+	user.grant_language(/datum/language/piratespeak, source = LANGUAGE_HAT)
+	to_chat(user, span_boldnotice("You suddenly know how to speak like a pirate!"))
 
 /obj/item/clothing/head/costume/pirate/dropped(mob/user)
 	. = ..()
-	if(!ishuman(user))
+	if(QDELETED(src)) //This can be called as a part of destroy
 		return
-	var/mob/living/carbon/human/H = user
-	if(H.get_item_by_slot(ITEM_SLOT_HEAD) == src && !QDELETED(src)) //This can be called as a part of destroy
-		user.remove_language(/datum/language/piratespeak/, source = LANGUAGE_HAT)
-		to_chat(user, span_boldnotice("You can no longer speak like a pirate."))
+	user.remove_language(/datum/language/piratespeak, source = LANGUAGE_HAT)
+	to_chat(user, span_boldnotice("You can no longer speak like a pirate."))
 
 /obj/item/clothing/head/costume/pirate/armored
 	armor_type = /datum/armor/pirate_armored
-	strip_delay = 40
-	equip_delay_other = 20
+	strip_delay = 4 SECONDS
+	equip_delay_other = 2 SECONDS
 
 /datum/armor/pirate_armored
 	melee = 30
@@ -47,14 +45,13 @@
 
 /obj/item/clothing/head/costume/pirate/bandana
 	name = "pirate bandana"
-	desc = "Yarr."
 	icon_state = "bandana"
 	inhand_icon_state = null
 
 /obj/item/clothing/head/costume/pirate/bandana/armored
 	armor_type = /datum/armor/bandana_armored
-	strip_delay = 40
-	equip_delay_other = 20
+	strip_delay = 4 SECONDS
+	equip_delay_other = 2 SECONDS
 
 /datum/armor/bandana_armored
 	melee = 30

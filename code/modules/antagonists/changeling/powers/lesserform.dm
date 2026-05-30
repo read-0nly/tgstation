@@ -3,6 +3,7 @@
 	desc = "We debase ourselves and become lesser. We become a monkey. Costs 5 chemicals."
 	helptext = "The transformation greatly reduces our size, allowing us to slip out of cuffs and climb through vents."
 	button_icon_state = "lesser_form"
+	category = "stealth"
 	chemical_cost = 5
 	dna_cost = 1
 	/// Whether to allow the transformation animation to play
@@ -30,7 +31,7 @@
 	if(user.movement_type & VENTCRAWLING)
 		user.balloon_alert(user, "can't transform in pipes!")
 		return FALSE
-	var/datum/antagonist/changeling/changeling = user.mind.has_antag_datum(/datum/antagonist/changeling)
+	var/datum/antagonist/changeling/changeling = IS_CHANGELING(user)
 	var/datum/changeling_profile/chosen_form = select_form(changeling, user)
 	if(!chosen_form)
 		return FALSE

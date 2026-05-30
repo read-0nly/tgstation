@@ -1,12 +1,12 @@
-/mob/living/silicon/robot/Life(seconds_per_tick = SSMOBS_DT, times_fired)
+/mob/living/silicon/robot/Life(seconds_per_tick = SSMOBS_DT)
 	if(HAS_TRAIT(src, TRAIT_NO_TRANSFORM))
 		return
 
-	..()
+	. = ..()
 	handle_robot_hud_updates()
-	handle_robot_cell(seconds_per_tick, times_fired)
+	handle_robot_cell(seconds_per_tick)
 
-/mob/living/silicon/robot/proc/handle_robot_cell(seconds_per_tick, times_fired)
+/mob/living/silicon/robot/proc/handle_robot_cell(seconds_per_tick)
 	if(stat == DEAD)
 		return
 
@@ -14,14 +14,14 @@
 		if(cell?.charge)
 			low_power_mode = FALSE
 	else if(stat == CONSCIOUS)
-		use_power(seconds_per_tick, times_fired)
+		use_energy(seconds_per_tick)
 
-/mob/living/silicon/robot/proc/use_power(seconds_per_tick, times_fired)
+/mob/living/silicon/robot/proc/use_energy(seconds_per_tick)
 	if(cell?.charge)
-		if(cell.charge <= 100)
+		if(cell.charge <= 0.01 * STANDARD_CELL_CHARGE)
 			drop_all_held_items()
-		var/amt = clamp(lamp_enabled * lamp_intensity * seconds_per_tick, 0.5 * seconds_per_tick, cell.charge) //Lamp will use a max of 5 charge, depending on brightness of lamp. If lamp is off, borg systems consume 1 point of charge, or the rest of the cell if it's lower than that.
-		cell.use(amt) //Usage table: 0.5/second if off/lowest setting, 4 = 2/second, 6 = 4/second, 8 = 6/second, 10 = 8/second
+		var/energy_consumption = max(lamp_power_consumption * lamp_enabled * lamp_intensity * seconds_per_tick, BORG_MINIMUM_POWER_CONSUMPTION * seconds_per_tick) //Lamp will use a max of 5 * [BORG_LAMP_POWER_CONSUMPTION], depending on brightness of lamp. If lamp is off, borg systems consume [BORG_MINIMUM_POWER_CONSUMPTION], or the rest of the cell if it's lower than that.
+		cell.use(energy_consumption, force = TRUE)
 	else
 		drop_all_held_items()
 		low_power_mode = TRUE
@@ -37,22 +37,27 @@
 /mob/living/silicon/robot/update_health_hud()
 	if(!client || !hud_used)
 		return
-	if(hud_used.healths)
-		if(stat != DEAD)
-			if(health >= maxHealth)
-				hud_used.healths.icon_state = "health0"
-			else if(health > maxHealth*0.6)
-				hud_used.healths.icon_state = "health2"
-			else if(health > maxHealth*0.2)
-				hud_used.healths.icon_state = "health3"
-			else if(health > -maxHealth*0.2)
-				hud_used.healths.icon_state = "health4"
-			else if(health > -maxHealth*0.6)
-				hud_used.healths.icon_state = "health5"
-			else
-				hud_used.healths.icon_state = "health6"
-		else
-			hud_used.healths.icon_state = "health7"
+
+	var/atom/movable/screen/healths/healths = hud_used.screen_objects[HUD_MOB_HEALTH]
+	if(!healths)
+		return
+
+	if(stat == DEAD)
+		healths.icon_state = "health7"
+		return
+
+	if(health >= maxHealth)
+		healths.icon_state = "health0"
+	else if(health > maxHealth*0.6)
+		healths.icon_state = "health2"
+	else if(health > maxHealth*0.2)
+		healths.icon_state = "health3"
+	else if(health > -maxHealth*0.2)
+		healths.icon_state = "health4"
+	else if(health > -maxHealth*0.6)
+		healths.icon_state = "health5"
+	else
+		healths.icon_state = "health6"
 
 /mob/living/silicon/robot/proc/update_cell_hud_icon()
 	if(cell)

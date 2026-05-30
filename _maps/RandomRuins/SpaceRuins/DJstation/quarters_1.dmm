@@ -16,7 +16,7 @@
 /area/ruin/space/djstation)
 "k" = (
 /obj/structure/bed,
-/obj/item/bedsheet/random,
+/obj/effect/spawner/random/bedsheet/any,
 /turf/open/floor/iron/grimy,
 /area/ruin/space/djstation)
 "p" = (
@@ -24,16 +24,15 @@
 	name = "Rest Room"
 	},
 /turf/template_noop,
-/area/template_noop)
+/area/space/nearstation)
 "u" = (
 /obj/machinery/duct,
 /turf/open/floor/iron/grimy,
 /area/ruin/space/djstation)
 "v" = (
 /obj/structure/toilet{
-	pixel_y = 8
+	dir = 1
 	},
-/obj/machinery/duct,
 /obj/machinery/light/small/directional/south,
 /turf/open/floor/iron/freezer,
 /area/ruin/space/djstation)
@@ -41,7 +40,7 @@
 /obj/structure/bed{
 	dir = 4
 	},
-/obj/item/bedsheet/random{
+/obj/effect/spawner/random/bedsheet/any{
 	dir = 4
 	},
 /turf/open/floor/iron/grimy,
@@ -52,7 +51,7 @@
 	},
 /obj/modular_map_connector,
 /turf/template_noop,
-/area/template_noop)
+/area/space/nearstation)
 "F" = (
 /obj/structure/curtain,
 /obj/machinery/shower/directional/south,

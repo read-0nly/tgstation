@@ -65,7 +65,7 @@
 /obj/machinery/shuttle_scrambler/proc/dump_loot(mob/user)
 	if(credits_stored) // Prevents spamming empty holochips
 		new /obj/item/holochip(drop_location(), credits_stored)
-		to_chat(user,span_notice("You retrieve the siphoned credits!"))
+		to_chat(user,span_notice("You retrieve the siphoned [MONEY_NAME]!"))
 		credits_stored = 0
 	else
 		to_chat(user,span_notice("There's nothing to withdraw."))
@@ -95,6 +95,9 @@
 	icon_keyboard = "syndie_key"
 	light_color = COLOR_SOFT_RED
 	possible_destinations = "pirate_away;pirate_home;pirate_custom"
+
+/obj/machinery/computer/shuttle/pirate/drop_pod
+	possible_destinations = "null"
 
 /obj/machinery/computer/camera_advanced/shuttle_docker/syndicate/pirate
 	name = "pirate shuttle navigation computer"
@@ -140,8 +143,6 @@
 
 /// Looks across the station for items that are pirate specific exports
 /obj/machinery/loot_locator/proc/find_random_loot()
-	if(!GLOB.exports_list.len)
-		setupExports()
 	var/list/possible_loot = list()
 	for(var/datum/export/pirate/possible_export in GLOB.exports_list)
 		possible_loot += possible_export
@@ -157,25 +158,26 @@
 	name = "Advanced Surgery Disk"
 	desc = "A disk that contains advanced surgery procedures, must be loaded into an Operating Console."
 	surgeries = list(
-		/datum/surgery/advanced/lobotomy,
-		/datum/surgery/advanced/bioware/vein_threading,
-		/datum/surgery/advanced/bioware/nerve_splicing,
-		/datum/surgery_step/heal/combo/upgraded,
-		/datum/surgery_step/pacify,
-		/datum/surgery_step/revive,
+		/datum/surgery_operation/organ/lobotomy,
+		/datum/surgery_operation/organ/lobotomy/mechanic,
+		/datum/surgery_operation/limb/bioware/vein_threading,
+		/datum/surgery_operation/limb/bioware/vein_threading/mechanic,
+		/datum/surgery_operation/limb/bioware/nerve_splicing,
+		/datum/surgery_operation/limb/bioware/nerve_splicing/mechanic,
+		/datum/surgery_operation/basic/tend_wounds/combo/upgraded,
+		/datum/surgery_operation/organ/pacify,
+		/datum/surgery_operation/organ/pacify/mechanic,
 	)
 
 //Pad & Pad Terminal
 /obj/machinery/piratepad
 	name = "cargo hold pad"
 	icon = 'icons/obj/machines/telepad.dmi'
-	icon_state = "lpad-idle-off"
-	///This is the icon_state that this telepad uses when it's not in use.
-	var/idle_state = "lpad-idle-off"
-	///This is the icon_state that this telepad uses when it's warming up for goods teleportation.
-	var/warmup_state = "lpad-idle"
-	///This is the icon_state to flick when the goods are being sent off by the telepad.
-	var/sending_state = "lpad-beam"
+	icon_state = "lpad-off"
+	base_icon_state = "lpad"
+	/// Determines what icon is being shown
+	VAR_PRIVATE/is_sending = FALSE
+
 	///This is the cargo hold ID used by the piratepad_control. Match these two to link them together.
 	var/cargo_hold_id
 
@@ -186,15 +188,36 @@
 		balloon_alert(user, "saved to multitool buffer")
 		return TRUE
 
-/obj/machinery/piratepad/screwdriver_act_secondary(mob/living/user, obj/item/screwdriver/screw)
-	. = ..()
-	if(!.)
-		return default_deconstruction_screwdriver(user, "lpad-idle-open", "lpad-idle-off", screw)
+/obj/machinery/piratepad/screwdriver_act(mob/living/user, obj/item/tool)
+	return default_deconstruction_screwdriver(user, tool)
+
+/obj/machinery/piratepad/screwdriver_act_secondary(mob/living/user, obj/item/tool)
+	return screwdriver_act(user, tool)
+
+/obj/machinery/piratepad/crowbar_act(mob/living/user, obj/item/tool)
+	return default_deconstruction_crowbar(user, tool)
 
 /obj/machinery/piratepad/crowbar_act_secondary(mob/living/user, obj/item/tool)
+	return crowbar_act(user, tool)
+
+/obj/machinery/piratepad/proc/set_is_sending(value)
+	if(is_sending == value)
+		return
+	is_sending = value
+	update_appearance()
+
+/obj/machinery/piratepad/proc/finish_sending()
+	set_is_sending(FALSE)
+	flick("[base_icon_state]-beam", src)
+
+/obj/machinery/piratepad/update_icon_state()
 	. = ..()
-	default_deconstruction_crowbar(tool)
-	return TRUE
+	if(panel_open)
+		icon_state = "[base_icon_state]-open"
+	else if(is_sending)
+		icon_state = "[base_icon_state]"
+	else
+		icon_state = "[base_icon_state]-off"
 
 /obj/machinery/computer/piratepad_control
 	name = "cargo hold control terminal"
@@ -218,6 +241,8 @@
 	var/interface_type = "CargoHoldTerminal"
 	///Typecache of things that shouldn't be sold and shouldn't have their contents sold.
 	var/static/list/nosell_typecache
+	/// When we send the pad for this machine, do we want to lazyload in the ninja holding facility?
+	var/load_holding_facility = TRUE
 
 /obj/machinery/computer/piratepad_control/Initialize(mapload)
 	..()
@@ -232,7 +257,7 @@
 		pad_ref = WEAKREF(I.buffer)
 		return TRUE
 
-/obj/machinery/computer/piratepad_control/LateInitialize()
+/obj/machinery/computer/piratepad_control/post_machine_initialize()
 	. = ..()
 	if(cargo_hold_id)
 		for(var/obj/machinery/piratepad/P as anything in SSmachines.get_machines_by_type_and_subtypes(/obj/machinery/piratepad))
@@ -258,7 +283,7 @@
 	data["status_report"] = status_report
 	return data
 
-/obj/machinery/computer/piratepad_control/ui_act(action, params)
+/obj/machinery/computer/piratepad_control/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
 	if(.)
 		return
@@ -270,7 +295,7 @@
 			recalc()
 			. = TRUE
 		if("send")
-			start_sending()
+			start_sending(params["global"], usr)
 			. = TRUE
 		if("stop")
 			stop_sending()
@@ -283,12 +308,9 @@
 
 	status_report = "Predicted value: "
 	var/value = 0
-	var/datum/export_report/report = new
+
 	var/obj/machinery/piratepad/pad = pad_ref?.resolve()
-	for(var/atom/movable/AM in get_turf(pad))
-		if(AM == pad)
-			continue
-		export_item_and_contents(AM, apply_elastic = FALSE, dry_run = TRUE, external_report = report, ignore_typecache = nosell_typecache)
+	var/datum/export_report/report = pirate_export_loop(pad)
 
 	for(var/datum/export/exported_datum in report.total_amount)
 		status_report += exported_datum.total_printout(report,notes = FALSE)
@@ -298,18 +320,15 @@
 	if(!value)
 		status_report += "0"
 
-/// Deletes and sells the item
-/obj/machinery/computer/piratepad_control/proc/send()
+/**
+ * Sorts through all items on the control pad via pirate_export_loop, then generates a printout to view in the TGUI.
+ */
+/obj/machinery/computer/piratepad_control/proc/send(check_global = FALSE, mob/user)
 	if(!sending)
 		return
 
-	var/datum/export_report/report = new
 	var/obj/machinery/piratepad/pad = pad_ref?.resolve()
-
-	for(var/atom/movable/item_on_pad in get_turf(pad))
-		if(item_on_pad == pad)
-			continue
-		export_item_and_contents(item_on_pad, apply_elastic = FALSE, delete_unsold = FALSE, external_report = report, ignore_typecache = nosell_typecache)
+	var/datum/export_report/report = pirate_export_loop(pad, dry_run = FALSE)
 
 	status_report = "Sold: "
 	var/value = 0
@@ -337,12 +356,38 @@
 		status_report += "Nothing"
 
 	pad.visible_message(span_notice("[pad] activates!"))
-	flick(pad.sending_state,pad)
-	pad.icon_state = pad.idle_state
+	pad.finish_sending()
 	sending = FALSE
 
+///The loop that calculates the value of stuff on a pirate pad, or plain sell them if dry_run is FALSE.
+/obj/machinery/computer/piratepad_control/proc/pirate_export_loop(obj/machinery/piratepad/pad, dry_run = TRUE)
+	var/datum/export_report/report = new
+	for(var/atom/movable/item_on_pad as anything in get_turf(pad))
+		if(item_on_pad == pad)
+			continue
+		var/list/hidden_mobs = list()
+		var/skip_movable = FALSE
+		var/list/item_contents = item_on_pad.get_all_contents()
+		for(var/atom/movable/thing in reverse_range(item_contents))
+			///Don't destroy/sell stuff like the captain's laser gun, or borgs.
+			if(thing.resistance_flags & INDESTRUCTIBLE || is_type_in_typecache(thing, nosell_typecache))
+				skip_movable = TRUE
+				break
+			if(isliving(thing))
+				hidden_mobs += thing
+		if(skip_movable)
+			continue
+		for(var/mob/living/hidden as anything in hidden_mobs)
+			///Sell mobs, but leave their contents intact.
+			export_single_item(hidden, apply_elastic = FALSE, dry_run = dry_run, external_report = report)
+		///there are still licing mobs inside that item. Stop, don't sell it ffs.
+		if(locate(/mob/living) in item_on_pad.get_all_contents())
+			continue
+		export_item_and_contents(item_on_pad, apply_elastic = FALSE, dry_run = dry_run, delete_unsold = FALSE, external_report = report, ignore_typecache = nosell_typecache, export_markets = list(EXPORT_MARKET_STATION, EXPORT_MARKET_PIRACY))
+	return report
+
 /// Prepares to sell the items on the pad
-/obj/machinery/computer/piratepad_control/proc/start_sending()
+/obj/machinery/computer/piratepad_control/proc/start_sending(check_global = FALSE, mob/user)
 	var/obj/machinery/piratepad/pad = pad_ref?.resolve()
 	if(!pad)
 		status_report = "No pad detected. Build or link a pad."
@@ -357,8 +402,11 @@
 	sending = TRUE
 	status_report = "Sending... "
 	pad.visible_message(span_notice("[pad] starts charging up."))
-	pad.icon_state = pad.warmup_state
-	sending_timer = addtimer(CALLBACK(src, PROC_REF(send)),warmup_time, TIMER_STOPPABLE)
+	pad.set_is_sending(TRUE)
+	sending_timer = addtimer(CALLBACK(src, PROC_REF(send), check_global, user), warmup_time, TIMER_STOPPABLE)
+	if(load_holding_facility)
+		//We ensure that the holding facility is loaded in time in case we're selling mobs.
+		SSmapping.lazy_load_template(LAZY_TEMPLATE_KEY_NINJA_HOLDING_FACILITY)
 
 /// Finishes the sending state of the pad
 /obj/machinery/computer/piratepad_control/proc/stop_sending(custom_report)
@@ -369,8 +417,12 @@
 	if(custom_report)
 		status_report = custom_report
 	var/obj/machinery/piratepad/pad = pad_ref?.resolve()
-	pad.icon_state = pad.idle_state
+	pad.set_is_sending(FALSE)
 	deltimer(sending_timer)
+
+/datum/export/pirate
+	abstract_type = /datum/export/pirate
+	sales_market = EXPORT_MARKET_PIRACY
 
 /// Attempts to find the thing on station
 /datum/export/pirate/proc/find_loot()
@@ -389,16 +441,42 @@
 	if(head_mobs.len)
 		return pick(head_mobs)
 
-/datum/export/pirate/ransom/get_cost(atom/movable/exported_item)
-	var/mob/living/carbon/human/ransomee = exported_item
-	if(ransomee.stat != CONSCIOUS || !ransomee.mind) //mint condition only
+/datum/export/pirate/ransom/get_base_cost(mob/living/carbon/human/ransomee)
+	if(ransomee.stat != CONSCIOUS || !ransomee.mind || HAS_TRAIT(ransomee.mind, TRAIT_HAS_BEEN_KIDNAPPED)) //mint condition only
 		return 0
-	else if(FACTION_PIRATE in ransomee.faction) //can't ransom your fellow pirates to CentCom!
+	else if(ransomee.has_faction(FACTION_PIRATE)) //can't ransom your fellow pirates to CentCom!
 		return 0
 	else if(HAS_TRAIT(ransomee, TRAIT_HIGH_VALUE_RANSOM))
 		return 3000
 	else
 		return 1000
+
+/datum/export/pirate/ransom/sell_object(mob/living/carbon/human/sold_item, datum/export_report/report, dry_run = TRUE, apply_elastic = TRUE)
+	. = ..()
+	if(. == EXPORT_NOT_SOLD || dry_run)
+		return
+	var/turf/picked_turf = pick(GLOB.holdingfacility)
+	sold_item.forceMove(picked_turf)
+	var/mob_cost = get_cost(sold_item)
+	sold_item.process_capture(mob_cost, mob_cost * 1.2)
+	do_sparks(8, FALSE, sold_item)
+	playsound(picked_turf, 'sound/items/weapons/emitter2.ogg', 25, TRUE)
+	sold_item.flash_act()
+	sold_item.adjust_confusion(10 SECONDS)
+	sold_item.adjust_dizzy(10 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(send_back_to_station), sold_item), COME_BACK_FROM_CAPTURE_TIME)
+	to_chat(sold_item, span_hypnophrase("A million voices echo in your head... <i>\"Yaarrr, thanks for the booty, landlubber. \
+		You will be ransomed back to your station, so it's only a matter of time before we ship you back...</i>"))
+
+	return EXPORT_SOLD_DONT_DELETE
+
+///Send them back to the station after a while.
+/datum/export/pirate/ransom/proc/send_back_to_station(mob/living/prisoner)
+	///Deleted or already bailed out of the place.
+	if(QDELETED(prisoner) || !istype(get_area(prisoner), /area/centcom/central_command_areas/holding))
+		return
+	var/obj/structure/closet/supplypod/back_to_station/return_pod = new()
+	return_pod.return_from_capture(prisoner)
 
 /datum/export/pirate/parrot
 	cost = 2000
@@ -413,18 +491,20 @@
 
 /datum/export/pirate/cash
 	cost = 1
-	unit_name = "bills"
+	k_hit_percentile = 0.1 / MAX_STACK_SIZE
+	unit_name = "bill"
 	export_types = list(/obj/item/stack/spacecash)
 
-/datum/export/pirate/cash/get_amount(obj/exported_item)
-	var/obj/item/stack/spacecash/cash = exported_item
-	return ..() * cash.amount * cash.value
+/datum/export/pirate/cash/get_amount(obj/item/stack/spacecash/cash)
+	return cash.amount
+
+/datum/export/pirate/cash/get_base_cost(obj/item/stack/spacecash/cash)
+	return cash.value
 
 /datum/export/pirate/holochip
 	cost = 1
 	unit_name = "holochip"
 	export_types = list(/obj/item/holochip)
 
-/datum/export/pirate/holochip/get_cost(atom/movable/exported_item)
-	var/obj/item/holochip/chip = exported_item
+/datum/export/pirate/holochip/get_base_cost(obj/item/holochip/chip)
 	return chip.credits
